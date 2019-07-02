@@ -1,3 +1,5 @@
+import { linspace } from "./math";
+
 export function randomSeq(count: number) {
   const result = [];
 
@@ -6,4 +8,8 @@ export function randomSeq(count: number) {
   }
 
   return result;
+}
+
+export function linearSeq(start: number, stop: number) {
+  return (count: number) => linspace(start, stop, count);
 }
