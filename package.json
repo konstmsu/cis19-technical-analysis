@@ -1,0 +1,32 @@
+{
+  "name": "technical-analysis",
+  "version": "1.0.0",
+  "description": "CodeIT Suisse 2019 challenge",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "lint": "tslint --project ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.com:CodeITSuisse2019/challenges/technical-analysis.git"
+  },
+  "keywords": [
+    "cis2019",
+    "challenge"
+  ],
+  "author": "Konstantin Spirin",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^12.0.10",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.15",
+    "jest": "^24.8.0",
+    "prettier": "^1.18.2",
+    "ts-jest": "^24.0.2",
+    "ts-node": "^8.3.0"
+  }
+}
