@@ -14,3 +14,11 @@ export function linspace(start: number, stop: number, num: number): number[] {
   }
   return values;
 }
+
+export function range(startInclusive: number, endExclusive: number): number[] {
+  const result = new Array(endExclusive - startInclusive);
+  for (let i = 0; i < result.length; i++) {
+    result[i] = i + startInclusive;
+  }
+  return result;
+}
