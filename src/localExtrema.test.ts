@@ -92,11 +92,15 @@ describe("local extrema", () => {
       const extrema = getLocalExtrema(numbers);
       expect(extrema.indexes[0]).toEqual(0);
       let isMovingFromMax = extrema.firstExtremumKind === "Maximum";
+
       let extremumIndex = 1;
+
       for (let i = 1; i < numbers.length; i++) {
         const d = numbers[i] - numbers[i - 1];
+
         if (isMovingFromMax) expect(d).toBeLessThanOrEqual(0);
         else expect(d).toBeGreaterThanOrEqual(0);
+
         if (extrema.indexes[extremumIndex] == i) {
           extremumIndex++;
           isMovingFromMax = !isMovingFromMax;
