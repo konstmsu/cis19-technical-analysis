@@ -6,7 +6,7 @@ function runProblem(
   generatePrices: (count: number) => number[],
   trainSize: number,
   testSize: number,
-  solve: (prices: number[], testSize: number) => number[],
+  solve: (prices: number[], testSize: number) => number[]
 ) {
   const prices = generatePrices(trainSize + testSize);
   const training = prices.slice(0, trainSize);
@@ -24,5 +24,10 @@ describe("price solver", () => {
   it("solve linear increasing", () => {
     const result = runProblem(linearSeq(9, 12), 2, 5, linearSolver);
     expect(result).toBeCloseTo(1.2, 5);
+  });
+
+  it("solve linear decresing", () => {
+    const result = runProblem(linearSeq(12, 7), 2, 4, linearSolver);
+    expect(result).toBeCloseTo(1, 5);
   });
 });

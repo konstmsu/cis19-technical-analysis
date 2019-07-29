@@ -88,7 +88,7 @@ describe("local extrema", () => {
 
   it("random stress", () => {
     const runRandomTest = () => {
-      const numbers = randomInt([1000], -3, 4) as number[];
+      const numbers = randomInt([500], -3, 4) as number[];
       const extrema = getLocalExtrema(numbers);
       expect(extrema.indexes[0]).toEqual(0);
       let isMovingFromMax = extrema.firstExtremumKind === "Maximum";
@@ -109,7 +109,7 @@ describe("local extrema", () => {
       expect(extremumIndex).toEqual(extrema.indexes.length);
     };
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 30; i++) {
       runRandomTest();
     }
   });
