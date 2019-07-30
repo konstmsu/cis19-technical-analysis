@@ -8,3 +8,7 @@ export function linearSolver(prices: number[], testSize: number) {
   }
   return [0, testSize - 1];
 }
+
+export function sinSolver(prices: number[], testSize: number) {
+  return [0, testSize - 1];
+}
