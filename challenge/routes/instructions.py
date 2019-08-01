@@ -2,10 +2,11 @@ import logging
 
 import markdown
 from flask import render_template, Markup
-from flask import url_for, redirect;
-from challenge import  app;
+from flask import url_for, redirect
+from challenge import app
 
 logger = logging.getLogger(__name__)
+
 
 @app.route('/')
 def default():
@@ -16,8 +17,10 @@ def default():
 def get_instructions():
     logger.info("Received request for Instructions")
     instructions = "".join(open("README.md", 'r').readlines())
-    body = Markup(markdown.markdown(instructions, extensions=markdown_extensions()));
-    return render_template('index.html',content=body)
+    body = Markup(markdown.markdown(
+        instructions, extensions=markdown_extensions()))
+    return render_template('index.html', content=body)
+
 
 def markdown_extensions():
     return ['markdown.extensions.nl2br',

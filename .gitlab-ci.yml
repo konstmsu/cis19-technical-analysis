@@ -1,6 +1,20 @@
-Build:
-  image: python:3.7.3
+image: python:3.7.3
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+before_script:
+  - python -V
+  - pip install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
+
+test:
   script:
-    - python -V # Print out python version for debugging
-    - apt-get update -q -y
-    - pip install -r requirements.txt
+    - python setup.py test
+    - python setup.py flake8
