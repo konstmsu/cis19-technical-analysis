@@ -2,21 +2,24 @@ import json
 import logging
 import requests
 
-from flask import request
-from challenge import app
+from flask import request, current_app, Blueprint
 
+bp = Blueprint("evaluate", __name__,)
 logger = logging.getLogger(__name__)
-@app.route('/test')
+
+
+@bp.route('/test')
 def test_route():
     return "It Works!"
 
 
-@app.route('/evaluate', methods=['POST'])
+@bp.route('/evaluate', methods=['POST'])
 def evaluate():
     data = request.get_json()
-    teamUrl = data.get("teamUrl")
-    callbackUrl = data.get("callbackUrl")
-    runId = data.get("runId")
+    current_app.logger.warn(data)
+    teamUrl = data["teamUrl"]
+    callbackUrl = data["callbackUrl"]
+    runId = data["runId"]
     logging.info('teamUrl:' + teamUrl + '- callbackUrl:' +
                  callbackUrl + '- runId:' + runId)
     result = execute_team_solution(teamUrl)
@@ -54,5 +57,4 @@ def calculate_score(result, runId):
     responseMessage['score'] = marksScrored
     responseMessage['message'] = message
 
-    json_responseMessage = json.dumps(responseMessage)
-    return json_responseMessage
+    return json.dumps(responseMessage)

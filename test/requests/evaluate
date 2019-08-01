@@ -1,0 +1,8 @@
+POST http://localhost:5000/evaluate
+content-type: application/json
+
+{
+    "teamUrl": "abc",
+    "callbackUrl": "def",
+    "runId": "ghi"
+}
