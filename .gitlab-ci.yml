@@ -1,13 +1,4 @@
-image: node:latest
-
-cache:
-  key: ${CI_COMMIT_REF_SLUG}
-  paths:
-    - node_modules/
+image: python:latest
 
 before_script:
-  - yarn
-
-test:
-  script:
-    - yarn test
+  - python -V # Print out python version for debugging
