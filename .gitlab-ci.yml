@@ -1,5 +1,5 @@
 Build:
-  image: python:latest
+  image: python:3.7.3
   script:
     - python -V # Print out python version for debugging
     - apt-get update -q -y
