@@ -6,7 +6,7 @@ setup(name='cis19-technical-analysis',
       author='Konstantin Spirin',
       author_email='konstmsu@gmail.com',
       packages=find_packages(),
-      install_requires=['markdown', 'flask', 'gunicorn'],
+      install_requires=['markdown', 'flask', 'gunicorn', 'requests'],
       setup_requires=[
           "flake8"
       ])
