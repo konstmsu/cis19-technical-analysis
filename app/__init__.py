@@ -8,8 +8,4 @@ def create_app():
     app.register_blueprint(instructions.bp)
     app.register_blueprint(evaluate.bp)
 
-    @app.route("/hello")
-    def hello():
-        return "Hello, World!"
-
     return app
