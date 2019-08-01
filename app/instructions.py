@@ -3,17 +3,18 @@ import logging
 import markdown
 from flask import render_template, Markup
 from flask import url_for, redirect
-from challenge import app
+from flask import Blueprint
 
 logger = logging.getLogger(__name__)
+bp = Blueprint("auth", __name__,)
 
 
-@app.route('/')
+@bp.route('/')
 def default():
     return redirect(url_for('get_instructions'))
 
 
-@app.route('/instructions')
+@bp.route('/instructions')
 def get_instructions():
     logger.info("Received request for Instructions")
     instructions = "".join(open("README.md", 'r').readlines())
