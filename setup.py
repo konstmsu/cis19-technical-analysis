@@ -8,5 +8,5 @@ setup(name='cis19-technical-analysis',
       packages=find_packages(),
       install_requires=['markdown'],
       setup_requires=[
-          "flake8"
+          "flake8", 'gunicorn'
       ])

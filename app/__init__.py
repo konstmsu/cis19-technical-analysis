@@ -1,11 +1,9 @@
-import os
-
 from flask import Flask
-from app import instructions
+from . import instructions
 
 
-def create_app(test_config=None):
-    app = Flask(__name__, instance_relative_config=True)
+def create_app():
+    app = Flask(__name__)
 
     app.register_blueprint(instructions.bp)
 

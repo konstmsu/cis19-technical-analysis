@@ -1,23 +1,21 @@
-import logging
-
 import markdown
 from flask import render_template, Markup
 from flask import url_for, redirect
-from flask import Blueprint
+from flask import Blueprint, current_app
 
-logger = logging.getLogger(__name__)
-bp = Blueprint("auth", __name__,)
+bp = Blueprint("instructions", __name__,)
 
 
 @bp.route('/')
 def default():
-    return redirect(url_for('get_instructions'))
+    return redirect(url_for(f"{bp.name}.{get_instructions.__qualname__}"))
 
 
 @bp.route('/instructions')
 def get_instructions():
-    logger.info("Received request for Instructions")
-    instructions = "".join(open("README.md", 'r').readlines())
+    instructionsFile = "README.md"
+    current_app.logger.info(f'Serving {instructionsFile}')
+    instructions = "".join(open(instructionsFile, 'r').readlines())
     body = Markup(markdown.markdown(
         instructions, extensions=markdown_extensions()))
     return render_template('index.html', content=body)
