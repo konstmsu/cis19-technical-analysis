@@ -1,6 +1,3 @@
-# To add a new cell, type '#%%'
-# To add a new markdown cell, type '#%% [markdown]'
-
 #%%
 import numpy as np
 import matplotlib.pyplot as plt
@@ -35,8 +32,7 @@ plt.plot(y, "r+", y)
 
 
 #%%
-from collections import namedtuple
-from scipy.signal import argrelextrema, find_peaks
+from scipy.signal import argrelextrema
 
 n = 400
 offset = 41
@@ -60,8 +56,6 @@ def get_trades(price):
 
 def get_final_amount(price, trades):
     amount = 1
-    #    if len(trades) % 2 == 1:
-    #        trades = np.append(trades, trades[-1])
 
     for i in range(0, len(trades), 2):
         prev_amount = amount
@@ -69,7 +63,7 @@ def get_final_amount(price, trades):
         sell = price[trades[i + 1]]
         count = amount / buy
         amount = count * sell
-        print(f"Buy at {buy}, sell at {sell}, new amount is {amount}")
+        print(f"Buy at {buy:.2f}, sell at {sell:.2f}, new amount is {amount:.2f}")
         assert prev_amount <= amount, f"Traded at loss at {i}-{i+1}"
     return amount
 
@@ -79,5 +73,5 @@ trades = get_trades(signal)
 plt.vlines(trades[::2], signal.min(), signal.max(), "y", "--")
 plt.vlines(trades[1::2], signal.min(), signal.max(), "m", "--")
 amount = get_final_amount(signal, trades)
-print(f"Final amount is {amount}")
+print(f"The final amount is {amount:.2f}")
 
