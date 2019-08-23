@@ -1,9 +1,11 @@
 #%%
 import numpy as np
 import matplotlib.pyplot as plt
+from functools import reduce
+import operator
+from scipy.signal import argrelextrema, find_peaks
 
 
-#%%
 def get_trend(n):
     return np.arange(n) / (n - 1)
 
@@ -17,33 +19,35 @@ def get_wave(n, period_length):
 
 
 def get_waves(n, period_lengths):
-    waves = [get_wave(n, l) for l in period_lengths]
-    return np.sum(waves, axis=0)
+    components = (get_wave(n, l) for l in period_lengths)
+    return reduce(operator.add, components, np.zeros(n))
 
 
 def get_noise(n):
     return np.random.randn(n)
 
 
-n = 201
-y = get_waves(n, [100, 75]) + get_saw(n, 40) + 3 * get_trend(n) + 0.1 * get_noise(n)
-
-plt.plot(y, "r+", y)
-
-
-#%%
-from scipy.signal import argrelextrema
-
-n = 400
-offset = 41
-no = n + offset
-signal = (get_waves(no, [100, 75]) + get_saw(no, 40) + 3 * get_trend(no))[offset:]
-noise = 0.1 * get_noise(n)
+def generate_price(n):
+    # TODO Add offset to avoid zero sines @ 0
+    signal = np.ones(n)
+    signal += 1 * get_waves(n, [n // 3])
+    # signal += 1 * get_saw(n, n // 5)
+    # signal += 1 * get_trend(n)
+    noise = 0.0 * get_noise(n)
+    return np.stack((signal, noise))
 
 
-def get_trades(price):
-    mins = argrelextrema(price, np.less_equal)[0]
-    maxs = argrelextrema(price, np.greater_equal)[0]
+def plot(y):
+    plt.plot(y, "r+", y)
+    plt.figure()
+
+
+def get_optimal_trades(price):
+    mins = find_peaks(-price)[0]
+    maxs = find_peaks(price)[0]
+
+    print(f"Mins: {mins}")
+    print(f"Maxs: {maxs}")
 
     if maxs[0] < mins[0]:
         maxs = maxs[1:]
@@ -57,21 +61,34 @@ def get_trades(price):
 def get_final_amount(price, trades):
     amount = 1
 
-    for i in range(0, len(trades), 2):
+    for i in range(0, len(trades) - 1, 2):
         prev_amount = amount
         buy = price[trades[i]]
         sell = price[trades[i + 1]]
         count = amount / buy
         amount = count * sell
         print(f"Buy at {buy:.2f}, sell at {sell:.2f}, new amount is {amount:.2f}")
-        assert prev_amount <= amount, f"Traded at loss at {i}-{i+1}"
+        # assert prev_amount <= amount, f"Traded at loss at {i}-{i+1}"
+
     return amount
 
 
-plt.plot(signal, "g")
-trades = get_trades(signal)
-plt.vlines(trades[::2], signal.min(), signal.max(), "y", "--")
-plt.vlines(trades[1::2], signal.min(), signal.max(), "m", "--")
-amount = get_final_amount(signal, trades)
-print(f"The final amount is {amount:.2f}")
+def simulate(price, trades):
+    signal = price[0]
+    plt.plot(signal, "g")
+    plt.vlines(trades[::2], signal.min(), signal.max(), "y", "--")
+    plt.vlines(trades[1::2], signal.min(), signal.max(), "m", "--")
+    amount = get_final_amount(signal, trades)
+    print(f"The final amount is {amount:.2f}")
+
+
+def analyze(sample, test_n):
+    return []
+
+
+train_n = 50
+test_n = 100
+price = generate_price(train_n + test_n)
+plot(np.sum(price, axis=0))
+simulate(price, get_optimal_trades(price[0]))
 
