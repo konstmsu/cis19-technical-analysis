@@ -9,7 +9,8 @@ import glob
 import os.path
 import itertools
 from snapshottest import snapshot
-import a
+import importlib
+importlib.reload(a)
 
 
 print(a.hello("konst"))
