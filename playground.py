@@ -4,6 +4,15 @@ import matplotlib.pyplot as plt
 from functools import reduce
 import operator
 from scipy.signal import argrelextrema, find_peaks
+import json
+import glob
+import os.path
+import itertools
+from snapshottest import snapshot
+import a
+
+
+print(a.hello("konst"))
 
 
 def get_trend(n):
@@ -86,9 +95,43 @@ def analyze(sample, test_n):
     return []
 
 
+def get_new_filename(filename_template):
+    for i in itertools.count():
+        filename = filename_template.format(i)
+        if not os.path.isfile(filename):
+            return filename
+
+
+def write_test_data(description, data):
+    class NumpyEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, np.ndarray):
+                return obj.tolist()
+            return json.JSONEncoder.default(self, obj)
+
+    filename = get_new_filename(f"test/{description}_{{0:03d}}.json")
+    with open(filename, "w") as f:
+        json.dump(data, f, cls=NumpyEncoder)
+    print(f"Written to {filename}")
+
+
+def optimal_tests():
+    price_inputs = glob.glob("test/price_*.json")
+    assert len(price_inputs) > 0
+    for i in price_inputs:
+        with open(i) as f:
+            data = np.asarray(json.load(f))
+        result = get_optimal_trades(data[0])
+        snapshot.assert_match(result)
+
+
 train_n = 50
 test_n = 100
 price = generate_price(train_n + test_n)
+
+# write_test_data("price", price)
+optimal_tests()
+
 plot(np.sum(price, axis=0))
 simulate(price, get_optimal_trades(price[0]))
 
