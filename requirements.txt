@@ -1,1 +1,12 @@
--e .
+wheel
+flask
+numpy
+matplotlib
+pylint
+snapshottest
+pytest
+markdown
+requests
+responses
+scipy
+black

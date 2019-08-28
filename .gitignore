@@ -3,3 +3,5 @@
 /*.egg-info/
 /.pytest_cache/
 /env/
+/.mypy_cache/
+/.vscode/.ropeproject/
