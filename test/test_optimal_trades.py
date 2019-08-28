@@ -1,8 +1,8 @@
-from app.maths import local_extrema
+from app.maths import optimal_trades
 
 
 def do_test(values, expected_optimal_trades):
-    assert list(local_extrema(values)) == expected_optimal_trades
+    assert list(optimal_trades(values)) == expected_optimal_trades
 
 
 # def test_increasing():
