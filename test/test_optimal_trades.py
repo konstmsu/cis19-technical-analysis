@@ -1,8 +1,8 @@
 from app.maths import local_extrema
 
 
-def do_test(values, expected_local_extrema):
-    assert list(local_extrema(values)) == expected_local_extrema
+def do_test(values, expected_optimal_trades):
+    assert list(local_extrema(values)) == expected_optimal_trades
 
 
 # def test_increasing():
@@ -11,10 +11,10 @@ def do_test(values, expected_local_extrema):
 
 
 # def test_decreasing():
-#     do_test([5, 3], [0, 1])
-#     do_test([7, 5, 3], [0, 2])
+#     do_test([5, 3], [])
+#     do_test([7, 5, 3], [])
 
 
 def test_peak():
     do_test([5, 3, 4], [1])
-    do_test([2, 7, 9, 4], [2])
+    do_test([2, 7, 9, 4], [0, 2])

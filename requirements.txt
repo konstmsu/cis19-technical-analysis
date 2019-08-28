@@ -8,5 +8,4 @@ pytest
 markdown
 requests
 responses
-scipy
 black

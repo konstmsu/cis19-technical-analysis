@@ -3,18 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from functools import reduce
 import operator
-from scipy.signal import argrelextrema, find_peaks
 import json
 import glob
 import os.path
 import itertools
 from snapshottest import snapshot
 import importlib
-
-importlib.reload(a)
-
-
-print(a.hello("konst"))
 
 
 def get_trend(n):
