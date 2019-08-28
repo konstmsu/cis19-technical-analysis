@@ -9,3 +9,6 @@ def optimal_trades(values: np.ndarray) -> typing.Generator[int, None, None]:
         if (isLookingForMin and diff[i] > 0) or (not isLookingForMin and diff[i] < 0):
             yield i
             isLookingForMin = not isLookingForMin
+
+    if not isLookingForMin and diff[-1] > 0:
+        yield len(diff)
