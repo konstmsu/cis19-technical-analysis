@@ -1,3 +1,5 @@
 jupyter
 notebook
 mypy
+rope
+pylint

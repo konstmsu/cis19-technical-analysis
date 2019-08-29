@@ -4,15 +4,15 @@ import requests
 
 from flask import request, current_app, Blueprint, jsonify
 
-bp = Blueprint("evaluate", __name__)
+BLUEPRINT = Blueprint("evaluate", __name__)
 
 
-@bp.route("/test")
+@BLUEPRINT.route("/test")
 def test_route():
     return "It Works!"
 
 
-@bp.route("/evaluate", methods=["POST"])
+@BLUEPRINT.route("/evaluate", methods=["POST"])
 def evaluate():
     data = request.get_json()
     current_app.logger.warn(data)

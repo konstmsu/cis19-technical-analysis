@@ -9,9 +9,10 @@ cache:
 
 before_script:
   - ./install_requirements_dev.sh
-  - . ./env/bin/activate
+  - . ./venv/bin/activate
 
 test:
   script:
     - mypy .
     - pytest
+    - ./lint.sh

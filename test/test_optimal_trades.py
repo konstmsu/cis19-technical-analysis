@@ -1,8 +1,11 @@
-from app.maths import optimal_trades
+import glob
+import numpy as np
+import json
+from app.trade_optimizer import get_optimal_trades
 
 
 def do_test(values, expected_optimal_trades):
-    assert list(optimal_trades(values)) == expected_optimal_trades
+    assert list(get_optimal_trades(values)) == expected_optimal_trades
 
 
 def test_increasing():
@@ -18,3 +21,13 @@ def test_decreasing():
 def test_peak():
     do_test([5, 3, 4], [1, 2])
     do_test([2, 7, 9, 4], [0, 2])
+
+
+def test_files(snapshot):
+    price_inputs = glob.glob("test/price_*.json")
+    assert len(price_inputs) > 0
+    for i in price_inputs:
+        with open(i) as f:
+            data = np.asarray(json.load(f))
+        trades = list(get_optimal_trades(data[0]))
+        snapshot.assert_match(trades)

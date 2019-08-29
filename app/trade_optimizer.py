@@ -2,7 +2,7 @@ import numpy as np
 import typing
 
 
-def optimal_trades(values: np.ndarray) -> typing.Generator[int, None, None]:
+def get_optimal_trades(values: np.ndarray) -> typing.Generator[int, None, None]:
     diff = np.diff(values)
     isLookingForMin = True
     for i in range(len(diff)):
