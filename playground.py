@@ -32,7 +32,7 @@ def get_noise(n):
     return np.random.randn(n)
 
 
-def generate_price(n):
+def generate_price(n, random_seed):
     # TODO Add offset to avoid zero sines @ 0
     signal = np.ones(n)
     signal += 1 * get_waves(n, [n // 3])
@@ -139,3 +139,21 @@ downs = diff < 0
 moves = np.argwhere(ups | downs)
 extrema = ups[moves[:-1]] & downs[moves[1:]]
 moves[:-1][extrema]
+
+
+#%%
+import random
+rnd = random.Random(0)
+rnd.randint(0, 100)
+
+#%%
+def a():
+    value = 2
+    def aa():
+        nonlocal value
+        value = value + 1
+
+    aa()
+    return value
+
+print(a())
