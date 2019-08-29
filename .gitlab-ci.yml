@@ -6,7 +6,6 @@ variables:
 cache:
   paths:
     - .cache/pip
-    - env/
 
 before_script:
   - ./install_requirements_dev.sh
