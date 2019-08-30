@@ -22,5 +22,5 @@ test:
 production:
   stage: deploy
   script:
-    - git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/cis19-technical-analysis.git
+    - git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/technical-challenge2.git
     - git push -f heroku HEAD:master
