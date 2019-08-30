@@ -16,3 +16,9 @@ test:
     - mypy .
     - pytest
     - ./lint.sh --disable=fixme
+
+production:
+  type: deploy
+  script:
+    - git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/cis19-technical-analysis.git
+    - git push -f heroku master
