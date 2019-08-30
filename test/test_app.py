@@ -1,5 +1,5 @@
-import os
-import tempfile
+# pylint: disable=redefined-outer-name
+
 import responses
 
 import pytest
@@ -11,14 +11,14 @@ def client():
     app = create_app()
     app.config["TESTING"] = True
 
-    with app.test_client() as client:
-        yield client
+    with app.test_client() as test_client:
+        yield test_client
 
 
 def test_instructions(client):
     for url in ["/", "/instructions"]:
-        rv = client.get(url, follow_redirects=True)
-        assert b"Build trading strategy" in rv.data
+        response = client.get(url, follow_redirects=True)
+        assert b"Build trading strategy" in response.data
 
 
 @responses.activate

@@ -2,8 +2,8 @@ def simulate(prices, trades):
     money = 1
     security = 0
 
-    for t in sorted(trades):
-        price = prices[t]
+    for trade in sorted(trades):
+        price = prices[trade]
         if security:
             money = price * security
             security = 0

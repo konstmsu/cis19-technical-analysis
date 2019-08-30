@@ -1,6 +1,6 @@
 import glob
-import numpy as np
 import json
+import numpy as np
 from app.trade_optimizer import get_optimal_trades
 
 
@@ -25,9 +25,9 @@ def test_peak():
 
 def test_files(snapshot):
     price_inputs = glob.glob("test/price_*.json")
-    assert len(price_inputs) > 0
+    assert price_inputs
     for i in price_inputs:
-        with open(i) as f:
-            data = np.asarray(json.load(f))
+        with open(i) as file:
+            data = np.asarray(json.load(file))
         trades = list(get_optimal_trades(data[0]))
         snapshot.assert_match(trades)

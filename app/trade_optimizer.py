@@ -1,14 +1,14 @@
-import numpy as np
 import typing
+import numpy as np
 
 
 def get_optimal_trades(values: np.ndarray) -> typing.Generator[int, None, None]:
-    diff = np.diff(values)
-    isLookingForMin = True
-    for i in range(len(diff)):
-        if (isLookingForMin and diff[i] > 0) or (not isLookingForMin and diff[i] < 0):
+    diffs = np.diff(values)
+    is_next_min = True
+    for i, diff in enumerate(diffs):
+        if (is_next_min and diff > 0) or (not is_next_min and diff < 0):
             yield i
-            isLookingForMin = not isLookingForMin
+            is_next_min = not is_next_min
 
-    if not isLookingForMin and diff[-1] > 0:
-        yield len(diff)
+    if not is_next_min and diffs[-1] > 0:
+        yield len(diffs)
