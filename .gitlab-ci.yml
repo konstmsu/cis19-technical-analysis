@@ -15,4 +15,4 @@ test:
   script:
     - mypy .
     - pytest
-    - ./lint.sh
+    - ./lint.sh --disable=fixme
