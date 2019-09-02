@@ -2,6 +2,8 @@ import glob
 import json
 import numpy as np
 from app.trade_optimizer import get_optimal_trades
+from app.generation import PriceGenerator
+from app.trade_simulator import simulate
 
 
 def do_test(values, expected_optimal_trades):
@@ -31,3 +33,12 @@ def test_files(snapshot):
             data = np.asarray(json.load(file))
         trades = list(get_optimal_trades(data[0]))
         snapshot.assert_match(trades)
+
+
+def test_brute():
+    generator = PriceGenerator()
+    price = generator.generate_price(100)[0]
+    all_result = simulate(price, range(len(price)))
+    optimal_result = simulate(price, get_optimal_trades(price))
+    print(f"All is {all_result}, optimal is {optimal_result}")
+    assert all_result < optimal_result / 7
