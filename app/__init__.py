@@ -1,5 +1,5 @@
 from flask import Flask
-from . import instructions, evaluate
+from . import instructions, evaluate, sample_solver
 
 
 def create_app():
@@ -7,5 +7,6 @@ def create_app():
 
     app.register_blueprint(instructions.BLUEPRINT)
     app.register_blueprint(evaluate.BLUEPRINT)
+    app.register_blueprint(sample_solver.BLUEPRINT)
 
     return app

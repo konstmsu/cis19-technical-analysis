@@ -14,7 +14,7 @@ def test_route():
 @BLUEPRINT.route("/evaluate", methods=["POST"])
 def evaluate():
     data = request.get_json()
-    current_app.logger.warn(data)
+    current_app.logger.info(data)
     team_url = data["teamUrl"]
     callback_url = data["callbackUrl"]
     run_id = data["runId"]

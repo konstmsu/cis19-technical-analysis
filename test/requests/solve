@@ -1,0 +1,6 @@
+POST http://localhost:8000/solve
+content-type: application/json
+
+{
+	"price": [500, 501, 504, 502, 501]
+}

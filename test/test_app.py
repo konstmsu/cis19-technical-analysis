@@ -37,7 +37,7 @@ def test_evaluate(client):
         status=404,
     )
 
-    client.post(
+    response = client.post(
         "/evaluate",
         json={
             "teamUrl": "http://solver",
@@ -45,3 +45,6 @@ def test_evaluate(client):
             "runId": "142",
         },
     )
+
+    assert response.status == "200 OK"
+    assert response.get_json() == {"evaluate_status": "complete"}
