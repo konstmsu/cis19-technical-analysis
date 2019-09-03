@@ -1,4 +1,4 @@
 from app import create_app
-from logging.config import dictConfig
 
+# pylint: disable=invalid-name
 application = create_app()
