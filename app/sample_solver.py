@@ -3,7 +3,7 @@ from flask import Blueprint, request, jsonify, current_app
 BLUEPRINT = Blueprint("solver", __name__)
 
 
-@BLUEPRINT.route("/solve", methods=["POST"])
+@BLUEPRINT.route("/technical-analysis", methods=["POST"])
 def solve():
     data = request.get_json()
     current_app.logger.info("input: %s", data)

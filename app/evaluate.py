@@ -24,17 +24,22 @@ def evaluate():
     result = execute_team_solution(team_url)
     return_message = calculate_score(result, run_id)
 
-    url_substring = callback_url.split("://")
-    secure_url = url_substring[0] + "://cisadmin:soltandpepper@" + url_substring[1]
-    requests.post(secure_url, data=return_message)
+    # pylint: disable=line-too-long
+    authorization_token = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjb2RlaXRzdWlzc2VhcGFjMjAxOUBnbWFpbC5jb20iLCJleHAiOjE1Njk4NjA2NTF9.l9PrR9r9XFA0gdqvtW1hfOm4bmHSvAVW6es1eV72v3MwjGxBCQPNbE3QtF0WtFKaLEqqaumS8Ut_KkOgG1gWCA"
+    requests.post(
+        callback_url,
+        data=return_message,
+        headers={"Authorization": authorization_token},
+    )
+
     return jsonify({"evaluate_status": "complete"})
 
 
 def execute_team_solution(team_url):
     test_data = {}
-    test_data["input"] = 2
+    test_data["price"] = [500, 501, 520, 518]
     test_data_json = json.dumps(test_data)
-    url = team_url + "/challenge"
+    url = team_url + "/technical-analysis"
     response_content = str(requests.post(url, data=test_data_json).content, "utf-8")
     current_app.logger.info("teamUrl: " + team_url + "team result: " + response_content)
 

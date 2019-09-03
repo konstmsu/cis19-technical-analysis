@@ -25,23 +25,23 @@ def test_instructions(client):
 def test_evaluate(client):
     responses.add(
         responses.POST,
-        "http://solver/challenge",
+        "https://solver/technical-analysis",
         json={"error": "not found"},
         status=404,
     )
 
     responses.add(
         responses.POST,
-        "http://cisadmin:soltandpepper@codeit-suisse/result",
+        "https://codeit-suisse/result",
         json={"error": "not found"},
-        status=404,
+        status=200,
     )
 
     response = client.post(
         "/evaluate",
         json={
-            "teamUrl": "http://solver",
-            "callbackUrl": "http://codeit-suisse/result",
+            "teamUrl": "https://solver",
+            "callbackUrl": "https://codeit-suisse/result",
             "runId": "142",
         },
     )
