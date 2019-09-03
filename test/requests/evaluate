@@ -1,8 +1,8 @@
-POST http://localhost:8000/evaluate
+POST http://localhost:5000/evaluate
 content-type: application/json
 
 {
-    "teamUrl": "http://abc",
-    "callbackUrl": "def",
-    "runId": "ghi"
+    "teamUrl": "http://localhost:5000",
+    "callbackUrl": "http://localhost:5000/evaluate-callback",
+    "runId": "test_run_42"
 }

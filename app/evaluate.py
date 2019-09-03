@@ -1,4 +1,3 @@
-import json
 import requests
 
 from flask import request, current_app, Blueprint, jsonify
@@ -14,7 +13,6 @@ def test_route():
 @BLUEPRINT.route("/evaluate", methods=["POST"])
 def evaluate():
     data = request.get_json()
-    current_app.logger.info(data)
     team_url = data["teamUrl"]
     callback_url = data["callbackUrl"]
     run_id = data["runId"]
@@ -22,28 +20,29 @@ def evaluate():
         f"teamUrl: {team_url}, callbackUrl: {callback_url}, runId: {run_id}"
     )
     result = execute_team_solution(team_url)
-    return_message = calculate_score(result, run_id)
+    score = calculate_score(result, run_id)
 
     # pylint: disable=line-too-long
     authorization_token = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjb2RlaXRzdWlzc2VhcGFjMjAxOUBnbWFpbC5jb20iLCJleHAiOjE1Njk4NjA2NTF9.l9PrR9r9XFA0gdqvtW1hfOm4bmHSvAVW6es1eV72v3MwjGxBCQPNbE3QtF0WtFKaLEqqaumS8Ut_KkOgG1gWCA"
-    requests.post(
-        callback_url,
-        data=return_message,
-        headers={"Authorization": authorization_token},
+    callback_result = requests.post(
+        callback_url, json=score, headers={"Authorization": authorization_token}
     )
 
-    return jsonify({"evaluate_status": "complete"})
+    current_app.logger.info("Evaluate callback returned %s", callback_result.content)
+
+    return jsonify(
+        {"evaluate_status": "complete", "callback_result": str(callback_result.content)}
+    )
 
 
 def execute_team_solution(team_url):
-    test_data = {}
-    test_data["price"] = [500, 501, 520, 518]
-    test_data_json = json.dumps(test_data)
+    challenge_input = {"prices": [500, 501, 520, 518]}
     url = team_url + "/technical-analysis"
-    response_content = str(requests.post(url, data=test_data_json).content, "utf-8")
-    current_app.logger.info("teamUrl: " + team_url + "team result: " + response_content)
+    current_app.logger.info("Posting to %s input %s", url, challenge_input)
+    response = requests.post(url, json=challenge_input).json()
+    current_app.logger.info("url: %s, response: %s", url, response)
 
-    return response_content
+    return response
 
 
 def calculate_score(result, run_id):
@@ -61,4 +60,4 @@ def calculate_score(result, run_id):
     response_message["score"] = marks_scrored
     response_message["message"] = message
 
-    return json.dumps(response_message)
+    return response_message

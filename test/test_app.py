@@ -31,20 +31,20 @@ def test_evaluate(client):
     )
 
     responses.add(
-        responses.POST,
-        "https://codeit-suisse/result",
-        json={"error": "not found"},
-        status=200,
+        responses.POST, "https://codeit-suisse/evaluate-callback", body="ok", status=200
     )
 
     response = client.post(
         "/evaluate",
         json={
             "teamUrl": "https://solver",
-            "callbackUrl": "https://codeit-suisse/result",
+            "callbackUrl": "https://codeit-suisse/evaluate-callback",
             "runId": "142",
         },
     )
 
     assert response.status == "200 OK"
-    assert response.get_json() == {"evaluate_status": "complete"}
+    assert response.get_json() == {
+        "evaluate_status": "complete",
+        "callback_result": "b'ok'",
+    }
