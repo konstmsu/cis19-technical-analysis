@@ -63,8 +63,9 @@ def calculate_score(run_id, price, result):
     response_message = {}
     response_message["runId"] = run_id
     response_message["score"] = score
+    # pylint: disable=line-too-long
     response_message[
         "message"
-    ] = f"Got final money {money:.2f} out of {max_money:.2f}. Hence the score is {score:.1f}. Optimal trades were {optimal_trades}"
+    ] = f"Got money {money:.2f}, max {max_money:.2f}. Score: {score:.1f}. Optimal trades: {optimal_trades}"
 
     return response_message
