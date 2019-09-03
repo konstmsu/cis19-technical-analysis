@@ -2,8 +2,8 @@ import typing
 import numpy as np
 
 
-def get_optimal_trades(values: np.ndarray) -> typing.Generator[int, None, None]:
-    diffs = np.diff(values)
+def get_optimal_trades(signal: np.ndarray) -> typing.Generator[int, None, None]:
+    diffs = np.diff(signal)
     is_next_min = True
     for i, diff in enumerate(diffs):
         if (is_next_min and diff > 0) or (not is_next_min and diff < 0):

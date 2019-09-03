@@ -7,7 +7,7 @@ BLUEPRINT = Blueprint("solver", __name__)
 def solve():
     data = request.get_json()
     current_app.logger.info("Input: %s", data)
-    result = {"trades": [0, 1, 5]}
+    result = {"trades": [0, 9, 26, 42, 57, 73]}
     current_app.logger.info("Output: %s", result)
     return jsonify(result)
 

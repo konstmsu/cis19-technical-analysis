@@ -26,8 +26,8 @@ def test_evaluate(client):
     responses.add(
         responses.POST,
         "https://solver/technical-analysis",
-        json={"error": "not found"},
-        status=404,
+        json={"trades": [10, 20]},
+        status=200,
     )
 
     responses.add(
