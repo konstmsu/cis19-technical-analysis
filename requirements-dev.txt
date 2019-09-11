@@ -3,3 +3,5 @@ notebook
 mypy
 rope
 pylint
+sklearn
+pytest-profiling

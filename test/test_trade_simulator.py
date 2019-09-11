@@ -1,3 +1,4 @@
+import pytest
 from app.trade_simulator import simulate
 
 
@@ -23,3 +24,11 @@ def test_always_sell_at_the_end():
 
 def test_sort_trades():
     assert simulate([20, 10], [1, 0]) == 0.5
+
+
+def test_out_of_range():
+    with pytest.raises(Exception, match=r"-1 is out of range"):
+        simulate([42], [-1])
+
+    with pytest.raises(Exception, match=r"1 is out of range"):
+        simulate([42], [1])

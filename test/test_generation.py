@@ -1,12 +1,20 @@
-from app.generation import PriceGenerator
+from snapshottest.pytest import SnapshotTest
+from app.generation import ScenarioBuilder, get_standard_scenarios
 
 
-def test_generate_price():
-    price = PriceGenerator().generate_price(100)
-    assert price.shape == (2, 100)
-    assert abs(price[1].mean()) < 0.01
+def test_generate_price(snapshot: SnapshotTest):
+    builder = (
+        ScenarioBuilder(0, 1000, 0)
+        .add_base()
+        .add_trend()
+        .add_waves(10)
+        .add_noise()
+    )
+    snapshot.assert_match(builder.signal.tolist(), "signal")
+    snapshot.assert_match(builder.noise.tolist(), "noise")
 
 
 def test_generator_is_stable(snapshot):
-    price = PriceGenerator(42).generate_price(100).tolist()
-    snapshot.assert_match(price)
+    for i, builder in enumerate(get_standard_scenarios(42)):
+        snapshot.assert_match(builder.signal.tolist(), f"Signal {i}")
+        snapshot.assert_match(builder.noise.tolist(), f"Noise {i}")

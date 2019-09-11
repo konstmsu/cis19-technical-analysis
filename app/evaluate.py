@@ -1,10 +1,12 @@
+from typing import List
 import requests
-import numpy as np
 from flask import request, current_app, Blueprint, jsonify
 
 from . import trade_optimizer
 from . import trade_simulator
 from . import generation
+
+from .generation import ScenarioBuilder
 
 BLUEPRINT = Blueprint("evaluate", __name__)
 
@@ -40,32 +42,40 @@ def evaluate():
 
 def execute_team_solution(team_url, run_id):
     # TODO Loop over a range of scenarios and get combined score
-    generator = generation.PriceGenerator(42)
-    price = generator.generate_price(100)
-    challenge_input = {"prices": np.sum(price, axis=0).tolist()}
+    # TODO Use random seed
+    scernarios = generation.get_standard_scenarios(0)
+    challenge_input = [
+        {"test_size": s.test_size, "train": s.get_train_price().tolist()}
+        for s in scernarios
+    ]
     url = team_url + "/technical-analysis"
     current_app.logger.info("Posting to %s input %s", url, challenge_input)
-    result = requests.post(url, json=challenge_input).json()
-    current_app.logger.info("url: %s, response: %s", url, result)
+    results = requests.post(url, json=challenge_input).json()
+    current_app.logger.info("url: %s, response: %s", url, results)
 
-    return calculate_score(run_id, price, result)
+    return calculate_score(run_id, scernarios, results)
 
 
-def calculate_score(run_id, price, result):
-    trades = result["trades"]
-    signal = price[0]
-    money = trade_simulator.simulate(signal, trades)
-    optimal_trades = list(trade_optimizer.get_optimal_trades(signal))
-    max_money = trade_simulator.simulate(signal, optimal_trades)
+WEIGHTS = [1, 2, 3, 4]
 
-    score = min(100, money / max_money * 100)
 
-    response_message = {}
-    response_message["runId"] = run_id
-    response_message["score"] = score
-    # pylint: disable=line-too-long
-    response_message[
-        "message"
-    ] = f"Got money {money:.2f}, max {max_money:.2f}. Score: {score:.1f}. Optimal trades: {optimal_trades}"
+def calculate_score(run_id, scenarios: List[ScenarioBuilder], results):
+    total_score = 0
+    assert len(WEIGHTS) == len(scenarios)
+    messages = []
+    for weight, scenario, trades in zip(WEIGHTS, scenarios, results):
+        signal = scenario.test_signal
+        money = trade_simulator.simulate(signal, trades)
 
-    return response_message
+        optimal_trades = list(trade_optimizer.get_optimal_trades(signal))
+        max_money = trade_simulator.simulate(signal, optimal_trades)
+
+        score = trade_simulator.get_score(max_money, money)
+        total_score += score * weight
+
+        # pylint: disable=line-too-long
+        messages.append(
+            f"Scored {score:.2f}. Got money {money:.2f}, max {max_money:.2f}. Optimal trades: {optimal_trades}"
+        )
+
+    return {"runId": run_id, "score": total_score * 100, "message": "\n".join(messages)}
