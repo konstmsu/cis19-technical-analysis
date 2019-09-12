@@ -11,10 +11,10 @@ def test_generate_price(snapshot: SnapshotTest):
         .add_noise()
     )
     snapshot.assert_match(builder.signal.tolist(), "signal")
-    snapshot.assert_match(builder.noise.tolist(), "noise")
+    snapshot.assert_match(builder.train_noise.tolist(), "noise")
 
 
 def test_generator_is_stable(snapshot):
     for i, builder in enumerate(get_standard_scenarios(42)):
         snapshot.assert_match(builder.signal.tolist(), f"Signal {i}")
-        snapshot.assert_match(builder.noise.tolist(), f"Noise {i}")
+        snapshot.assert_match(builder.train_noise.tolist(), f"Noise {i}")

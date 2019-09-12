@@ -20,18 +20,23 @@ def wave(size: int, offset: float, period_count: float) -> np.ndarray:
 
 class ScenarioBuilder:
     def __init__(self, random_seed: int, train_size: int, test_size: int):
-        self.train_size = train_size
-        self.test_size = test_size
-        self.size = train_size + test_size
-
-        self.signal = np.zeros(self.size)
-        self.signal_description: List[str] = []
-        self.noise = np.zeros(self.size)
         self.rnd = np.random.RandomState(random_seed)
+        self.test_size = test_size
 
+        self.signal = np.zeros(train_size + test_size)
+        self.signal_description: List[str] = []
+
+        self.train_noise = np.zeros(train_size)
         self.train_signal = self.signal[:train_size]
         self.test_signal = self.signal[train_size:]
-        self.train_noise = self.noise[:train_size]
+
+    @property
+    def train_size(self):
+        return self.train_signal.shape[0]
+
+    @property
+    def size(self):
+        return self.signal.shape[0]
 
     def _add(self, description: str, signal: np.ndarray):
         self.signal_description.append(description)
@@ -39,24 +44,30 @@ class ScenarioBuilder:
 
     def add_base(self):
         scale = self.rnd.uniform(200, 300)
-        self._add("base", scale * base(self.size))
+        self._add(f"{scale:.0f}", scale * base(self.size))
         return self
 
     def add_trend(self):
         scale = self.rnd.uniform(-100, 100)
-        self._add("trend", scale * trend(self.size))
+        self._add(f"trend[{scale:.0f}]", scale * trend(self.size))
         return self
 
-    def add_waves(self, count: int):
+    def add_waves(self, count: int, period_count_range=(20, 50)):
         scales = self.rnd.uniform(5, 15, count)
-        period_counts = self.rnd.uniform(20, 50, count)
+        period_counts = self.rnd.uniform(
+            period_count_range[0], period_count_range[1], count
+        )
         offset = self.rnd.uniform(0, self.size * 10)
         for scale, period_count in zip(scales, period_counts):
-            self._add(f"wave", scale * wave(self.size, offset, period_count))
+            self._add(
+                f"{period_count:.1f} sines sized {scale:.0f}",
+                scale * wave(self.size, offset, period_count),
+            )
         return self
 
     def add_noise(self):
-        self.noise += self.rnd.standard_normal(self.size)
+        self.train_noise += self.rnd.standard_normal(self.train_size)
+        self.signal_description.append("noise")
         return self
 
     def get_train_price(self) -> np.ndarray:
@@ -77,7 +88,7 @@ def get_standard_scenarios(random_seed: int) -> List[ScenarioBuilder]:
     def get_satisfactory(train_size, test_size, builder_func):
         for attempt in range(10):
             builder = builder_func(create_builder(train_size, test_size))
-            if min(builder.signal) > 0 and min(builder.signal + builder.noise) > 0:
+            if min(builder.signal) > 0 and min(builder.get_train_price()) > 0:
                 return builder
             print(f"Attempt {attempt} failed")
 

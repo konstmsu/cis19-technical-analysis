@@ -17,7 +17,7 @@ test:
     - . ./venv/bin/activate
     - mypy .
     - pytest
-    - ./lint.sh --disable=fixme
+    - ./lint.sh --disable=fixme,unused-argument
 
 production:
   stage: deploy
