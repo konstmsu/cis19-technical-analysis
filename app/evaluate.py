@@ -40,15 +40,19 @@ def evaluate():
     )
 
 
+def create_challenge_input(scenarios):
+    return [
+        {"test_size": scenario.test_size, "train": scenario.get_train_price().tolist()}
+        for scenario in scenarios
+    ]
+
+
 def execute_team_solution(team_url, run_id):
     # TODO Loop over a range of scenarios and get combined score
     # TODO Use random seed
     scernarios = generation.get_standard_scenarios(0)
-    challenge_input = [
-        {"test_size": s.test_size, "train": s.get_train_price().tolist()}
-        for s in scernarios
-    ]
     url = team_url + "/technical-analysis"
+    challenge_input = create_challenge_input(scernarios)
     current_app.logger.info("Posting to %s input %s", url, challenge_input)
     results = requests.post(url, json=challenge_input).json()
     current_app.logger.info("url: %s, response: %s", url, results)

@@ -1,13 +1,16 @@
 #%%
 import importlib
+import json
+import pprint
 import numpy as np
 import matplotlib.pyplot as plt
-from app import generation, trade_optimizer, trade_simulator
+from app import generation, trade_optimizer, trade_simulator, evaluate
 
 importlib.reload(generation)
+importlib.reload(evaluate)
 
 
-def simulate(scenario, trades):
+def simulate(name, scenario, trades):
     fig = plt.figure()
     fig.set_size_inches(9, 4)
     plt.plot(scenario.get_train_price(), "g")
@@ -20,26 +23,37 @@ def simulate(scenario, trades):
     plt.vlines(
         trades[1::2], scenario.test_signal.min(), scenario.test_signal.max(), "m", "--"
     )
-    amount = trade_simulator.simulate(scenario.test_signal, trades - scenario.train_size)
+    plt.savefig(f"art/{name}.png")
+    amount = trade_simulator.simulate(
+        scenario.test_signal, trades - scenario.train_size
+    )
     print(f"Optimal trades: {trades}")
     print(f"The optimal amount is {amount:.2f}")
     print()
 
 
-def draw_sample(s):
-    trades = list(trade_optimizer.get_optimal_trades(s.test_signal))
-    simulate(s, s.train_size + np.array(trades))
-    print(" + ".join(s.signal_description))
+def display_scenarios(names, scenarios):
+    solutions = []
+    for name, scenario in zip(names, scenarios):
+        optimal_trades = list(trade_optimizer.get_optimal_trades(scenario.test_signal))
+        simulate(name, scenario, scenario.train_size + np.array(optimal_trades))
+        print(name, " + ".join(scenario.signal_description))
+        solutions.append(optimal_trades)
+
+    challenge_input = evaluate.create_challenge_input(scenarios)
+    print(pprint.pprint(challenge_input, width=120, compact=True))
+    print("Solutions:")
+    print(pprint.pprint(solutions))
 
 
-draw_sample(generation.ScenarioBuilder(0, 100, 200)
-    .add_base()
-    .add_trend()
-    .add_waves(2, period_count_range=(3, 5))
-    .add_noise())
-
-draw_sample(generation.ScenarioBuilder(0, 100, 200)
-    .add_base()
-    .add_trend()
-    .add_waves(4, period_count_range=(8, 14))
-    .add_noise())
+display_scenarios(
+    ["one", "two"],
+    [
+        generation.ScenarioBuilder(0, 20, 40).add_base()
+        # .add_trend()
+        .add_waves(2, period_count_range=(2, 2)).add_noise(),
+        generation.ScenarioBuilder(0, 20, 40).add_base()
+        # .add_trend()
+        .add_waves(4, period_count_range=(2, 4)).add_noise(),
+    ],
+)

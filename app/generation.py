@@ -23,10 +23,10 @@ class ScenarioBuilder:
         self.rnd = np.random.RandomState(random_seed)
         self.test_size = test_size
 
-        self.signal = np.zeros(train_size + test_size)
-        self.signal_description: List[str] = []
-
         self.train_noise = np.zeros(train_size)
+
+        self.signal_description: List[str] = []
+        self.signal = np.zeros(train_size + test_size)
         self.train_signal = self.signal[:train_size]
         self.test_signal = self.signal[train_size:]
 
