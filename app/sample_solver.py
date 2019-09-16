@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app
-
-import test
 from app.evaluate import ChallengeInput
+from . import my_solver
 
 BLUEPRINT = Blueprint("solver", __name__)
 
@@ -12,9 +11,7 @@ def solve():
     current_app.logger.info("Input: %s", data)
     result = []
     for scenario in data:
-        result.append(
-            test.my_solver.solve(scenario["train_data"], scenario["test_size"])
-        )
+        result.append(my_solver.solve(scenario["train_data"], scenario["test_size"]))
     current_app.logger.info("Output: %s", result)
     return jsonify(result)
 

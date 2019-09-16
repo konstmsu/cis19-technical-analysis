@@ -62,7 +62,26 @@ display_scenarios(
 
 #%%
 from app import my_solver
-fits = my_solver.fit_all_models(np.array([10, 12, 15, 14, 12, 11, 13, 16]))
 
-for model, popt, pcov in fits:
-    plt.plot(model(np.arange(20), *popt))
+importlib.reload(generation)
+importlib.reload(my_solver)
+
+
+def run_all_fits():
+    scenario = (
+        generation.ScenarioBuilder(0, 200, 400).add_base()
+        # .add_trend()
+        .add_waves(1, period_count_range=(2, 4))
+        # .add_noise()
+    )
+
+    fits = my_solver.fit_all_models(scenario.get_train_price())
+
+    plt.plot(scenario.signal)
+    plt.axvline(scenario.train_size, linestyle="--")
+    for model, popt, pcov in fits:
+        plt.plot(model(np.arange(scenario.size), *popt))
+        pprint.pprint(popt)
+
+
+run_all_fits()
