@@ -1,8 +1,8 @@
 # pylint: disable=redefined-outer-name
 
+import pytest
 import responses
 
-import pytest
 from app import create_app
 
 

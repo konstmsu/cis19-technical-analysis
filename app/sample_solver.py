@@ -1,7 +1,7 @@
-import test
 from flask import Blueprint, request, jsonify, current_app
-from app.evaluate import ChallengeInput
 
+import test
+from app.evaluate import ChallengeInput
 
 BLUEPRINT = Blueprint("solver", __name__)
 

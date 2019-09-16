@@ -1,6 +1,5 @@
-from app import my_solver
-import numpy as np
 from app import generation, trade_simulator
+from app import my_solver
 
 
 def test_my_solver():

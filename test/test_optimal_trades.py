@@ -1,10 +1,12 @@
 import glob
 import json
+
 import numpy as np
-from app.trade_optimizer import get_optimal_trades
-from app.generation import get_standard_scenarios
-from app.trade_simulator import simulate, get_score
+
 from app import my_solver
+from app.generation import get_standard_scenarios
+from app.trade_optimizer import get_optimal_trades
+from app.trade_simulator import simulate, get_score
 
 
 def do_test(values, expected_optimal_trades):

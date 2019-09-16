@@ -1,5 +1,6 @@
-import numpy as np
 from typing import Collection
+
+import numpy as np
 
 
 def simulate(signal: np.ndarray, zero_trade: int, trades: Collection[int]):

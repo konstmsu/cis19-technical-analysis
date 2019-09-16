@@ -1,7 +1,7 @@
 import markdown
+from flask import Blueprint, current_app
 from flask import render_template, Markup
 from flask import url_for, redirect
-from flask import Blueprint, current_app
 
 BLUEPRINT = Blueprint("instructions", __name__)
 

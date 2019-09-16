@@ -1,7 +1,9 @@
 import itertools
-import os
 import json
+import os
+
 import numpy as np
+
 
 # pylint: disable=inconsistent-return-statements
 def get_new_filename(filename_template):

@@ -1,5 +1,5 @@
 import pytest
-import numpy as np
+
 from app.trade_simulator import simulate
 
 

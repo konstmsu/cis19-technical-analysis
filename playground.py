@@ -1,14 +1,15 @@
 #%%
 import importlib
-import json
 import pprint
-import numpy as np
+
 import matplotlib.pyplot as plt
-from app import generation, trade_optimizer, trade_simulator, evaluate
-from app import my_solver
+import numpy as np
+
+from app import generation, evaluate, trade_simulator, trade_optimizer
 
 importlib.reload(generation)
 importlib.reload(evaluate)
+importlib.reload(trade_simulator)
 
 
 def simulate(name, scenario, trades):
@@ -60,6 +61,7 @@ display_scenarios(
 )
 
 #%%
+from app import my_solver
 fits = my_solver.fit_all_models(np.array([10, 12, 15, 14, 12, 11, 13, 16]))
 
 for model, popt, pcov in fits:

@@ -1,5 +1,6 @@
 from flask import Flask
-from . import instructions, evaluate, sample_solver
+
+from app import instructions, evaluate, sample_solver
 
 
 def create_app():

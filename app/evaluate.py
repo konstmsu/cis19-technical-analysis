@@ -1,11 +1,11 @@
 from typing import List, Collection, Dict
+
 import requests
 from flask import request, current_app, Blueprint, jsonify
 
+from . import generation
 from . import trade_optimizer
 from . import trade_simulator
-from . import generation
-
 from .generation import ScenarioBuilder
 
 BLUEPRINT = Blueprint("evaluate", __name__)

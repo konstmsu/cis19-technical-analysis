@@ -1,4 +1,5 @@
 from snapshottest.pytest import SnapshotTest
+
 from app.generation import ScenarioBuilder, get_standard_scenarios
 
 
