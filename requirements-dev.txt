@@ -5,3 +5,4 @@ rope
 pylint
 sklearn
 pytest-profiling
+pytest-watch

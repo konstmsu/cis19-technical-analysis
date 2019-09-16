@@ -14,8 +14,8 @@ def saw(size: int, period_count: float):
     return np.mod(np.linspace(0, period_count, size), 1)
 
 
-def wave(size: int, offset: float, period_count: float) -> np.ndarray:
-    return 0.5 + 0.5 * np.sin(offset + np.linspace(0, 2 * np.pi * period_count, size))
+def wave(size: int, period_count: float) -> np.ndarray:
+    return np.sin(np.linspace(0, 2 * np.pi * period_count, size))
 
 
 class ScenarioBuilder:
@@ -36,7 +36,7 @@ class ScenarioBuilder:
 
     @property
     def size(self):
-        return self.signal.shape[0]
+        return self.train_size + self.test_size
 
     def _add(self, description: str, signal: np.ndarray):
         self.signal_description.append(description)
@@ -57,11 +57,10 @@ class ScenarioBuilder:
         period_counts = self.rnd.uniform(
             period_count_range[0], period_count_range[1], count
         )
-        offset = self.rnd.uniform(0, self.size * 10)
         for scale, period_count in zip(scales, period_counts):
             self._add(
                 f"{period_count:.1f} sines sized {scale:.0f}",
-                scale * wave(self.size, offset, period_count),
+                scale * wave(self.size, period_count),
             )
         return self
 

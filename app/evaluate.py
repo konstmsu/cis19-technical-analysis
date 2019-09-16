@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Collection, Dict
 import requests
 from flask import request, current_app, Blueprint, jsonify
 
@@ -9,6 +9,9 @@ from . import generation
 from .generation import ScenarioBuilder
 
 BLUEPRINT = Blueprint("evaluate", __name__)
+
+# TODO Utilize TypedDict when Python 3.8 is released
+ChallengeInput = List[Dict]
 
 
 @BLUEPRINT.route("/test")
@@ -40,9 +43,12 @@ def evaluate():
     )
 
 
-def create_challenge_input(scenarios):
+def create_challenge_input(scenarios) -> ChallengeInput:
     return [
-        {"test_size": scenario.test_size, "train": scenario.get_train_price().tolist()}
+        {
+            "test_size": scenario.test_size,
+            "train_data": scenario.get_train_price().tolist(),
+        }
         for scenario in scenarios
     ]
 
@@ -63,16 +69,21 @@ def execute_team_solution(team_url, run_id):
 WEIGHTS = [1, 2, 3, 4]
 
 
-def calculate_score(run_id, scenarios: List[ScenarioBuilder], results):
+def calculate_score(
+    run_id: str,
+    scenarios: Collection[ScenarioBuilder],
+    results: Collection[Collection[int]],
+):
     total_score = 0
     assert len(WEIGHTS) == len(scenarios)
     messages = []
     for weight, scenario, trades in zip(WEIGHTS, scenarios, results):
-        signal = scenario.test_signal
-        money = trade_simulator.simulate(signal, trades)
+        money = trade_simulator.simulate(
+            scenario.test_signal, scenario.train_size, trades
+        )
 
-        optimal_trades = list(trade_optimizer.get_optimal_trades(signal))
-        max_money = trade_simulator.simulate(signal, optimal_trades)
+        optimal_trades = list(trade_optimizer.get_optimal_trades(scenario.test_signal))
+        max_money = trade_simulator.simulate(scenario.test_signal, 0, optimal_trades)
 
         score = trade_simulator.get_score(max_money, money)
         total_score += score * weight

@@ -1,20 +1,22 @@
-def simulate(signal, trades):
-    trades = list(trades)
+import numpy as np
+from typing import Collection
 
+
+def simulate(signal: np.ndarray, zero_trade: int, trades: Collection[int]):
     if trades:
-        earliest_trade = min(trades)
-        if earliest_trade < 0:
-            raise Exception(f"Trade {earliest_trade} is out of range")
+        upper_bound = zero_trade + len(signal)
 
-        lastest_trade = max(trades)
-        if lastest_trade >= len(signal):
-            raise Exception(f"Trade {lastest_trade} is out of range")
+        for trade in trades:
+            if not zero_trade <= trade < upper_bound:
+                raise Exception(
+                    f"Trade {trade} must be in [{zero_trade}, {upper_bound})"
+                )
 
     money = 1
     security = 0
 
     for trade in sorted(trades):
-        price = signal[trade]
+        price = signal[trade - zero_trade]
         if security:
             money = price * security
             security = 0

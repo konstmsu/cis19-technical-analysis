@@ -1,10 +1,10 @@
 import glob
 import json
-from test import my_solver
 import numpy as np
 from app.trade_optimizer import get_optimal_trades
 from app.generation import get_standard_scenarios
 from app.trade_simulator import simulate, get_score
+from app import my_solver
 
 
 def do_test(values, expected_optimal_trades):
@@ -41,27 +41,28 @@ def test_brute():
     scores = {}
     for seed in range(100):
         for i, scenario in enumerate(get_standard_scenarios(seed)):
-
-            signal = scenario.test_signal
-
-            optimal_trades = list(get_optimal_trades(signal))
-            optimal_result = simulate(signal, optimal_trades)
+            optimal_trades = list(get_optimal_trades(scenario.test_signal))
+            optimal_result = simulate(scenario.test_signal, 0, optimal_trades)
 
             description = f"Seed {seed}, scenario {i}"
 
             def record(name, trades, score_assertion):
-                result = simulate(signal, trades)
+                result = simulate(scenario.test_signal, scenario.train_size, trades)
                 score = get_score(optimal_result, result)
                 assert score_assertion(score), description
                 scores.setdefault(f"{name}_{i}", []).append(score)
 
             record("empty", [], lambda s: s == 0)
-            record("all", range(len(signal)), lambda s: s < 0.2)
+            record(
+                "all",
+                np.arange(scenario.train_size, scenario.size).tolist(),
+                lambda s: s < 0.2,
+            )
             record(
                 "random",
-                np.random.RandomState(seed).randint(
-                    scenario.test_size, size=len(optimal_trades)
-                ),
+                np.random.RandomState(seed)
+                .randint(scenario.train_size, scenario.size, size=len(optimal_trades))
+                .tolist(),
                 lambda s: s < 0.2,
             )
             # TODO Solver should be better scoring

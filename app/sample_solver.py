@@ -1,15 +1,20 @@
+import test
 from flask import Blueprint, request, jsonify, current_app
+from app.evaluate import ChallengeInput
+
 
 BLUEPRINT = Blueprint("solver", __name__)
 
 
 @BLUEPRINT.route("/technical-analysis", methods=["POST"])
 def solve():
-    data = request.get_json()
+    data: ChallengeInput = request.get_json()
     current_app.logger.info("Input: %s", data)
     result = []
     for scenario in data:
-        result.append(scenario["test_size"] + [0, 9, 26, 42, 57, 73])
+        result.append(
+            test.my_solver.solve(scenario["train_data"], scenario["test_size"])
+        )
     current_app.logger.info("Output: %s", result)
     return jsonify(result)
 

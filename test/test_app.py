@@ -26,7 +26,7 @@ def test_evaluate(client):
     responses.add(
         responses.POST,
         "https://solver/technical-analysis",
-        json=[[10, 20], [5, 10, 15]],
+        json=[[100, 120], [205, 210, 215]],
         status=200,
     )
 
