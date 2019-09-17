@@ -85,3 +85,51 @@ def run_all_fits():
 
 
 run_all_fits()
+
+#%%
+from scipy.optimize import curve_fit
+import numpy as np
+import matplotlib.pyplot as plt
+import pprint
+from scipy.optimize import differential_evolution
+
+
+def test_curve_fit():
+    x = np.arange(100)
+    y = 10 * np.sin(x * 2 * np.pi / 50)
+    plt.plot(y)
+
+    def model(xx, scale, period):
+        return scale * np.sin(xx * 2 * np.pi / period)
+
+    # function for genetic algorithm to minimize (sum of squared error)
+    def sumOfSquaredError(parameterTuple):
+        val = model(x, *parameterTuple)
+        return np.sum((y - val) ** 2.0)
+
+    def generate_Initial_Parameters():
+        # min and max used for bounds
+        maxX = max(x)
+        minX = min(x)
+        maxY = max(y)
+        minY = min(y)
+        maxXY = max(maxX, maxY)
+
+        parameterBounds = []
+        parameterBounds.append([-maxXY, maxXY]) # seach bounds for c
+        parameterBounds.append([-maxXY, maxXY]) # seach bounds for c
+
+        # "seed" the numpy random number generator for repeatable results
+        result = differential_evolution(sumOfSquaredError, parameterBounds, seed=3)
+        return result.x
+
+    # generate initial parameter values
+    geneticParameters = generate_Initial_Parameters()
+
+    topt, tcov = curve_fit(model, x, y, p0=geneticParameters, absolute_sigma=True)
+    pprint.pprint(topt)
+    y_pred = model(x, *topt)
+    plt.plot(y_pred)
+
+
+test_curve_fit()
