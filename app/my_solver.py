@@ -1,52 +1,55 @@
 from typing import List
 
 import numpy as np
-from scipy.optimize import curve_fit
+from scipy.optimize import curve_fit, differential_evolution
 
 from app.trade_optimizer import get_optimal_trades
 
 
-def fit_all_models(train_price: np.ndarray) -> List[tuple]:
+def solve(train_price: np.ndarray, test_size: int) -> List[int]:
     train_size = train_price.shape[0]
+    train_x = np.arange(train_size)
 
-    models = [
-        # pylint: disable=unnecessary-lambda
-        lambda x, base: np.full_like(x, base),
-        lambda x, base, trend: base + trend / (train_size - 1) * x,
-        lambda x, base, trend, scale0, width0: base
-        + trend / (train_size - 1) * x
-        + scale0 * np.sin(x * width0),
-        lambda x, base, trend, scale0, width0, scale1, width1: base
-        + trend / (train_size - 1) * x
-        + scale0 * np.sin(x * width0)
-        + scale1 * np.sin(x * width1),
-        lambda x, base, trend, scale0, width0, scale1, width1, scale2, width2: base
-        + trend / (train_size - 1) * x
-        + scale0 * np.sin(x * width0)
-        + scale1 * np.sin(x * width1)
-        + scale2 * np.sin(x * width2),
-    ]
+    # pylint: disable=invalid-name,too-many-arguments
+    def model(
+        x,
+        base,
+        trend,
+        scale0,
+        period0,
+        scale1,
+        period1,
+        scale2,
+        period2,
+        scale3,
+        period3,
+    ):
+        result = base + trend * x / (train_size + test_size)
+        for scale, period in (
+            (scale0, period0),
+            (scale1, period1),
+            (scale2, period2),
+            (scale3, period3),
+        ):
+            result += scale * np.sin(x * 2 * np.pi / period)
+        return result
 
-    return [
-        (
-            model,
-            *curve_fit(
-                model,
-                np.arange(train_size),
-                train_price,
-                p0=[200, 20, 5, 20, 6, 50, 7, 110][: model.__code__.co_argcount - 1],
-                absolute_sigma=True,
-                maxfev=10000,
-            ),
-        )
-        for model in models
-    ]
+    def generate_initial_parameters():
+        def model_error(model_parameters):
+            return np.sum((train_price - model(train_x, *model_parameters)) ** 2.0)
 
+        parameter_bounds = []
+        parameter_bounds.append([200, 300])
+        parameter_bounds.append([-100, 100])
+        argcount = model.__code__.co_argcount - 3
+        for _ in range(0, argcount, 2):
+            parameter_bounds.append([5, 15])
+            parameter_bounds.append([10, 100])
 
-def solve(train_price: np.ndarray, test_size: int) -> List[tuple]:
-    fits = fit_all_models(train_price)
-    train_size = train_price.shape[0]
-    model, popt, _ = fits[1]
+        result = differential_evolution(model_error, parameter_bounds)
+        return result.x
+
+    popt, _ = curve_fit(model, train_x, train_price, p0=generate_initial_parameters())
 
     extrapolated = model(np.arange(train_size, train_size + test_size), *popt)
 

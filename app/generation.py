@@ -96,7 +96,7 @@ def get_standard_scenarios(random_seed: int) -> List[ScenarioBuilder]:
 
     return [
         get_satisfactory(100, 1000, lambda b: b.add_waves(1)),
-        get_satisfactory(100, 1000, lambda b: b.add_waves(3)),
-        get_satisfactory(100, 1000, lambda b: b.add_waves(6).add_noise()),
-        get_satisfactory(100, 1000, lambda b: b.add_waves(20).add_noise()),
+        get_satisfactory(100, 1000, lambda b: b.add_waves(2)),
+        get_satisfactory(100, 1000, lambda b: b.add_waves(3).add_noise()),
+        get_satisfactory(100, 1000, lambda b: b.add_waves(4).add_noise()),
     ]

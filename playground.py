@@ -5,7 +5,7 @@ import pprint
 import matplotlib.pyplot as plt
 import numpy as np
 
-from app import generation, evaluate, trade_simulator, trade_optimizer
+from app import generation, evaluate, trade_simulator, trade_optimizer, my_solver
 
 importlib.reload(generation)
 importlib.reload(evaluate)
@@ -35,10 +35,9 @@ def simulate(name, scenario, trades):
 def display_scenarios(names, scenarios):
     solutions = []
     for name, scenario in zip(names, scenarios):
+        trades = my_solver.solve(scenario.get_train_price(), scenario.test_size)
         optimal_trades = list(trade_optimizer.get_optimal_trades(scenario.test_signal))
-        simulate(
-            name, scenario, [trade + scenario.train_size for trade in optimal_trades]
-        )
+        simulate(name, scenario, trades)
         print(name, " + ".join(scenario.signal_description))
         solutions.append(optimal_trades)
 
@@ -49,42 +48,9 @@ def display_scenarios(names, scenarios):
 
 
 display_scenarios(
-    ["one", "two"],
-    [
-        generation.ScenarioBuilder(0, 20, 40).add_base()
-        # .add_trend()
-        .add_waves(2, period_count_range=(2, 2)).add_noise(),
-        generation.ScenarioBuilder(0, 20, 40).add_base()
-        # .add_trend()
-        .add_waves(4, period_count_range=(2, 4)).add_noise(),
-    ],
+    ["one", "two", "three", "four"],
+    generation.get_standard_scenarios(0),
 )
-
-#%%
-from app import my_solver
-
-importlib.reload(generation)
-importlib.reload(my_solver)
-
-
-def run_all_fits():
-    scenario = (
-        generation.ScenarioBuilder(0, 200, 400).add_base()
-        # .add_trend()
-        .add_waves(1, period_count_range=(2, 4))
-        # .add_noise()
-    )
-
-    fits = my_solver.fit_all_models(scenario.get_train_price())
-
-    plt.plot(scenario.signal)
-    plt.axvline(scenario.train_size, linestyle="--")
-    for model, popt, pcov in fits:
-        plt.plot(model(np.arange(scenario.size), *popt))
-        pprint.pprint(popt)
-
-
-run_all_fits()
 
 #%%
 from scipy.optimize import curve_fit
@@ -92,41 +58,61 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pprint
 from scipy.optimize import differential_evolution
+from app.generation import ScenarioBuilder
 
 
 def test_curve_fit():
     x = np.arange(100)
-    y = 10 * np.sin(x * 2 * np.pi / 50)
+    scenario = (
+        ScenarioBuilder(2, 100, 1000).add_base().add_trend().add_waves(4).add_noise()
+    )
+    y = scenario.get_train_price()
     plt.plot(y)
 
-    def model(xx, scale, period):
-        return scale * np.sin(xx * 2 * np.pi / period)
+    def model(
+        xx,
+        base,
+        trend,
+        scale0,
+        period0,
+        scale1,
+        period1,
+        scale2,
+        period2,
+        scale3,
+        period3,
+    ):
+        result = base + trend * xx / x.shape[0]
+        for scale, period in (
+            (scale0, period0),
+            (scale1, period1),
+            (scale2, period2),
+            (scale3, period3),
+        ):
+            result += scale * np.sin(xx * 2 * np.pi / period)
+        return result
 
     # function for genetic algorithm to minimize (sum of squared error)
     def sumOfSquaredError(parameterTuple):
-        val = model(x, *parameterTuple)
-        return np.sum((y - val) ** 2.0)
+        return np.sum((y - model(x, *parameterTuple)) ** 2.0)
 
-    def generate_Initial_Parameters():
-        # min and max used for bounds
-        maxX = max(x)
-        minX = min(x)
-        maxY = max(y)
-        minY = min(y)
-        maxXY = max(maxX, maxY)
+    def generate_initial_parameter():
+        parameter_bounds = []
+        parameter_bounds.append([200, 300])
+        parameter_bounds.append([-100, 100])
+        argcount = model.__code__.co_argcount - 3
+        for _ in range(0, argcount, 2):
+            parameter_bounds.append([5, 15])
+            parameter_bounds.append([20, 40])
 
-        parameterBounds = []
-        parameterBounds.append([-maxXY, maxXY]) # seach bounds for c
-        parameterBounds.append([-maxXY, maxXY]) # seach bounds for c
-
-        # "seed" the numpy random number generator for repeatable results
-        result = differential_evolution(sumOfSquaredError, parameterBounds, seed=3)
+        result = differential_evolution(
+            sumOfSquaredError, parameter_bounds, seed=3, maxiter=100
+        )
         return result.x
 
-    # generate initial parameter values
-    geneticParameters = generate_Initial_Parameters()
+    initial_parameters = generate_initial_parameter()
 
-    topt, tcov = curve_fit(model, x, y, p0=geneticParameters, absolute_sigma=True)
+    topt, tcov = curve_fit(model, x, y, p0=initial_parameters, absolute_sigma=True)
     pprint.pprint(topt)
     y_pred = model(x, *topt)
     plt.plot(y_pred)

@@ -3,7 +3,6 @@ import json
 
 import numpy as np
 
-from app import my_solver
 from app.generation import get_standard_scenarios
 from app.trade_optimizer import get_optimal_trades
 from app.trade_simulator import simulate, get_score
@@ -66,12 +65,6 @@ def test_brute():
                 .randint(scenario.train_size, scenario.size, size=len(optimal_trades))
                 .tolist(),
                 lambda s: s < 0.2,
-            )
-            # TODO Solver should be better scoring
-            record(
-                "my solver",
-                my_solver.solve(scenario.get_train_price(), scenario.test_size),
-                lambda s: s >= 0,
             )
 
     for k in sorted(scores.keys()):
