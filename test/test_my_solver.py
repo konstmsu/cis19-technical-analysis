@@ -8,7 +8,9 @@ def test_my_solver():
         for scenario_index, scenario in enumerate(
             generation.get_standard_scenarios(seed)
         ):
-            trades = my_solver.solve(scenario.get_train_price(), scenario.test_size)
+            trades, _, _ = my_solver.solve(
+                scenario.get_train_price(), scenario.test_size
+            )
             result = trade_simulator.simulate(
                 scenario.test_signal, scenario.train_size, trades
             )

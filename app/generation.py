@@ -19,6 +19,7 @@ def wave(size: int, period_count: float) -> np.ndarray:
     return np.sin(np.linspace(0, 2 * np.pi * period_count, size))
 
 
+# pylint: disable=too-many-instance-attributes
 class ScenarioBuilder:
     def __init__(self, random_seed: int, train_size: int, test_size: int):
         self.rnd = np.random.RandomState(random_seed)
@@ -30,6 +31,7 @@ class ScenarioBuilder:
         self.signal = np.zeros(train_size + test_size)
         self.train_signal = self.signal[:train_size]
         self.test_signal = self.signal[train_size:]
+        self.wave_count = 1
 
     @property
     def train_size(self):
@@ -53,11 +55,18 @@ class ScenarioBuilder:
         self._add(f"trend[{scale:.0f}]", scale * trend(self.size))
         return self
 
-    def add_waves(self, count: int, period_count_range=(20, 50)):
+    def create_period_counts(self, count):
+        for _ in range(100):
+            period_counts = np.sort(self.rnd.uniform(20, 50, count))
+            if count < 2 or min(np.diff(period_counts)) > 5:
+                return period_counts
+        return period_counts
+
+    def add_waves(self, count: int):
+        self.wave_count += count
         scales = self.rnd.uniform(5, 15, count)
-        period_counts = self.rnd.uniform(
-            period_count_range[0], period_count_range[1], count
-        )
+        period_counts = self.create_period_counts(count)
+
         for scale, period_count in zip(scales, period_counts):
             self._add(
                 f"{period_count:.1f} sines sized {scale:.0f}",
@@ -66,8 +75,8 @@ class ScenarioBuilder:
         return self
 
     def add_noise(self):
-        self.train_noise += self.rnd.standard_normal(self.train_size)
-        self.signal_description.append("noise")
+        # self.train_noise += self.rnd.standard_normal(self.train_size)
+        # self.signal_description.append("noise")
         return self
 
     def get_train_price(self) -> np.ndarray:
@@ -97,6 +106,6 @@ def get_standard_scenarios(random_seed: int) -> List[ScenarioBuilder]:
     return [
         get_satisfactory(100, 1000, lambda b: b.add_waves(1)),
         get_satisfactory(100, 1000, lambda b: b.add_waves(2)),
-        get_satisfactory(100, 1000, lambda b: b.add_waves(3).add_noise()),
-        get_satisfactory(100, 1000, lambda b: b.add_waves(4).add_noise()),
+        get_satisfactory(100, 1000, lambda b: b.add_waves(3)),
+        get_satisfactory(100, 1000, lambda b: b.add_waves(4)),
     ]

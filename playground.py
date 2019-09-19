@@ -10,47 +10,49 @@ from app import generation, evaluate, trade_simulator, trade_optimizer, my_solve
 importlib.reload(generation)
 importlib.reload(evaluate)
 importlib.reload(trade_simulator)
+importlib.reload(my_solver)
 
 
-def simulate(name, scenario, trades):
+def simulate(name, scenario):
+    trades, model, popt = my_solver.solve(
+        scenario.get_train_price(), scenario.test_size
+    )
+    amount = trade_simulator.simulate(scenario.test_signal, scenario.train_size, trades)
+    optimal_trades = list(trade_optimizer.get_optimal_trades(scenario.test_signal))
+    optimal_amount = trade_simulator.simulate(scenario.test_signal, 0, optimal_trades)
     fig = plt.figure()
     fig.set_size_inches(9, 4)
     plt.plot(scenario.get_train_price(), "g")
-    plt.plot(
-        np.arange(scenario.test_size) + scenario.train_size, scenario.test_signal, "y"
-    )
-    plt.vlines(
-        trades[::2], scenario.test_signal.min(), scenario.test_signal.max(), "y", "--"
-    )
-    plt.vlines(
-        trades[1::2], scenario.test_signal.min(), scenario.test_signal.max(), "m", "--"
-    )
+    test_x = np.arange(scenario.test_size) + scenario.train_size
+    model_y = model(test_x)
+    plt.plot(test_x, scenario.test_signal, "y")
+    plt.plot(test_x, model_y, "b")
+    x_full = np.arange(scenario.size)
+    plt.plot(x_full, scenario.signal - model(x_full), "m")
+    # line_min = scenario.test_signal.min()
+    # line_max = scenario.test_signal.max()
+    # plt.vlines(trades[::2], line_min, line_max, "y", "--")
+    # plt.vlines(trades[1::2], line_min, line_max, "m", "--")
     plt.savefig(f"art/{name}.png")
-    amount = trade_simulator.simulate(scenario.test_signal, scenario.train_size, trades)
-    print(f"Optimal trades: {trades}")
-    print(f"The optimal amount is {amount:.2f}")
-    print()
+    if amount < optimal_amount:
+        print(f"{name}")
+        print(f"Amount is {amount:.2f}, max_amount is {optimal_amount:.2f}")
+        print(f"Model options: {popt}")
+        # print(f"Trades: {trades}")
+        # print(f"Optimal trades: {optimal_trades}")
+        print()
 
 
 def display_scenarios(names, scenarios):
-    solutions = []
     for name, scenario in zip(names, scenarios):
-        trades = my_solver.solve(scenario.get_train_price(), scenario.test_size)
-        optimal_trades = list(trade_optimizer.get_optimal_trades(scenario.test_signal))
-        simulate(name, scenario, trades)
+        simulate(name, scenario)
         print(name, " + ".join(scenario.signal_description))
-        solutions.append(optimal_trades)
 
     challenge_input = evaluate.create_challenge_input(scenarios)
-    print(pprint.pprint(challenge_input, width=120, compact=True))
-    print("Solutions:")
-    print(pprint.pprint(solutions))
+    # print(pprint.pprint(challenge_input, width=120, compact=True))
 
 
-display_scenarios(
-    ["one", "two", "three", "four"],
-    generation.get_standard_scenarios(0),
-)
+display_scenarios(["one", "two", "three", "four"], generation.get_standard_scenarios(0))
 
 #%%
 from scipy.optimize import curve_fit

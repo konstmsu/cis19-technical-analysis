@@ -4,8 +4,10 @@ import numpy as np
 
 
 def simulate(signal: np.ndarray, zero_trade: int, trades: Collection[int]):
+    signal = np.asarray(signal)
+
     if trades:
-        upper_bound = zero_trade + len(signal)
+        upper_bound = zero_trade + signal.shape[0]
 
         for trade in trades:
             if not zero_trade <= trade < upper_bound:
