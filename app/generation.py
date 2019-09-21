@@ -1,89 +1,78 @@
 from typing import List
-
 import numpy as np
 
 
-def base(size: int) -> np.ndarray:
-    return np.ones(size)
+# pylint: disable=too-many-instance-attributes,too-few-public-methods
+class Scenario:
+    def __init__(self, model, model_parameters, train_size: int, test_size: int):
+        self.train_size = train_size
+        self.test_size = test_size
+        self.size = train_size + test_size
+
+        self.model_parameters = model_parameters
+        self.model = model
+
+        signal = model(np.arange(self.size), *model_parameters)
+        self.train_signal = np.round(signal[:train_size]).astype(
+            np.int32, casting="unsafe"
+        )
+        self.test_signal = signal[-test_size:]
+
+        assert self.train_signal.shape[0] + self.test_signal.shape[0] == self.size
+
+    @property
+    def sine_count(self):
+        return (len(self.model_parameters) - 2) // 2
 
 
-def trend(size: int) -> np.ndarray:
-    return np.linspace(0, 1, size)
-
-
-def saw(size: int, period_count: float):
-    return np.mod(np.linspace(0, period_count, size), 1)
-
-
-def wave(size: int, period_count: float) -> np.ndarray:
-    return np.sin(np.linspace(0, 2 * np.pi * period_count, size))
-
-
-# pylint: disable=too-many-instance-attributes
 class ScenarioBuilder:
     def __init__(self, random_seed: int, train_size: int, test_size: int):
         self.rnd = np.random.RandomState(random_seed)
+        self.train_size = train_size
         self.test_size = test_size
+        self.model_parameters = np.array([0, 0])
 
-        self.train_noise = np.zeros(train_size)
+    def build(self) -> Scenario:
+        x_scale = 1 / (self.train_size + self.test_size - 1)
+        # pylint: disable=invalid-name
+        def model(x, base, trend, *waves):
+            result = base + trend * x_scale * x
 
-        self.signal_description: List[str] = []
-        self.signal = np.zeros(train_size + test_size)
-        self.train_signal = self.signal[:train_size]
-        self.test_signal = self.signal[train_size:]
-        self.wave_count = 1
+            for scale, period_count in zip(waves[::2], waves[1::2]):
+                result += scale * np.sin(2 * np.pi * period_count * x_scale * x)
 
-    @property
-    def train_size(self):
-        return self.train_signal.shape[0]
+            return result
 
-    @property
-    def size(self):
-        return self.train_size + self.test_size
+        return Scenario(model, self.model_parameters, self.train_size, self.test_size)
 
-    def _add(self, description: str, signal: np.ndarray):
-        self.signal_description.append(description)
-        self.signal += signal
-
-    def add_base(self):
-        scale = self.rnd.uniform(200, 300)
-        self._add(f"{scale:.0f}", scale * base(self.size))
+    def set_base(self):
+        self.model_parameters[0] = self.rnd.uniform(200, 300)
         return self
 
-    def add_trend(self):
-        scale = self.rnd.uniform(-100, 100)
-        self._add(f"trend[{scale:.0f}]", scale * trend(self.size))
+    def set_trend(self):
+        self.model_parameters[1] = self.rnd.uniform(-100, 100)
         return self
 
-    def create_period_counts(self, count):
+    def _create_period_counts(self, count):
         for _ in range(100):
-            period_counts = np.sort(self.rnd.uniform(20, 50, count))
-            if count < 2 or min(np.diff(period_counts)) > 5:
+            period_counts = np.sort(self.rnd.uniform(11, 100, count))
+            if count < 2 or min(np.diff(period_counts)) > 10:
                 return period_counts
-        return period_counts
+        raise Exception(f"Could not come up with {count} periods")
 
     def add_waves(self, count: int):
-        self.wave_count += count
         scales = self.rnd.uniform(5, 15, count)
-        period_counts = self.create_period_counts(count)
+        period_counts = self._create_period_counts(count)
 
         for scale, period_count in zip(scales, period_counts):
-            self._add(
-                f"{period_count:.1f} sines sized {scale:.0f}",
-                scale * wave(self.size, period_count),
+            self.model_parameters = np.append(
+                self.model_parameters, [scale, period_count]
             )
+
         return self
 
-    def add_noise(self):
-        # self.train_noise += self.rnd.standard_normal(self.train_size)
-        # self.signal_description.append("noise")
-        return self
 
-    def get_train_price(self) -> np.ndarray:
-        return self.train_signal + self.train_noise
-
-
-def get_standard_scenarios(random_seed: int) -> List[ScenarioBuilder]:
+def get_standard_scenarios(random_seed: int) -> List[Scenario]:
     rnd = np.random.RandomState(random_seed)
 
     def next_seed():
@@ -91,14 +80,15 @@ def get_standard_scenarios(random_seed: int) -> List[ScenarioBuilder]:
 
     def create_builder(train_size, test_size):
         return (
-            ScenarioBuilder(next_seed(), train_size, test_size).add_base().add_trend()
+            ScenarioBuilder(next_seed(), train_size, test_size).set_base().set_trend()
         )
 
     def get_satisfactory(train_size, test_size, builder_func):
         for attempt in range(10):
             builder = builder_func(create_builder(train_size, test_size))
-            if min(builder.signal) > 0 and min(builder.get_train_price()) > 0:
-                return builder
+            scenario = builder.build()
+            if min(scenario.train_signal) > 0 and min(scenario.test_signal) > 0:
+                return scenario
             print(f"Attempt {attempt} failed")
 
         raise Exception("couldn't create satisfactory scenario")

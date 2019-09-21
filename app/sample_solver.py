@@ -11,7 +11,9 @@ def solve():
     current_app.logger.info("Input: %s", data)
     result = []
     for scenario in data:
-        result.append(my_solver.solve(scenario["train_data"], scenario["test_size"]))
+        result.append(
+            my_solver.solve(0, scenario["train_data"], scenario["test_size"], 3)
+        )
     current_app.logger.info("Output: %s", result)
     return jsonify(result)
 

@@ -5,15 +5,13 @@ import numpy as np
 
 def simulate(signal: np.ndarray, zero_trade: int, trades: Collection[int]):
     signal = np.asarray(signal)
+    trades = list(trades)
 
-    if trades:
-        upper_bound = zero_trade + signal.shape[0]
+    upper_bound = zero_trade + signal.shape[0]
 
-        for trade in trades:
-            if not zero_trade <= trade < upper_bound:
-                raise Exception(
-                    f"Trade {trade} must be in [{zero_trade}, {upper_bound})"
-                )
+    for trade in trades:
+        if not zero_trade <= trade < upper_bound:
+            raise Exception(f"Trade {trade} must be in [{zero_trade}, {upper_bound})")
 
     money = 1
     security = 0

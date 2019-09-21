@@ -6,7 +6,6 @@ from flask import request, current_app, Blueprint, jsonify
 from . import generation
 from . import trade_optimizer
 from . import trade_simulator
-from .generation import ScenarioBuilder
 
 BLUEPRINT = Blueprint("evaluate", __name__)
 
@@ -44,13 +43,7 @@ def evaluate():
 
 
 def create_challenge_input(scenarios) -> ChallengeInput:
-    return [
-        {
-            "test_size": scenario.test_size,
-            "train_data": scenario.get_train_price().tolist(),
-        }
-        for scenario in scenarios
-    ]
+    return [scenario.train_signal.tolist() for scenario in scenarios]
 
 
 def execute_team_solution(team_url, run_id):
@@ -71,7 +64,7 @@ WEIGHTS = [1, 2, 3, 4]
 
 def calculate_score(
     run_id: str,
-    scenarios: Collection[ScenarioBuilder],
+    scenarios: Collection[generation.Scenario],
     results: Collection[Collection[int]],
 ):
     total_score = 0

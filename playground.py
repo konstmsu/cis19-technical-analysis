@@ -1,6 +1,7 @@
 #%%
 import importlib
 import pprint
+import time
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,29 +14,36 @@ importlib.reload(trade_simulator)
 importlib.reload(my_solver)
 
 
-def simulate(name, scenario):
+def simulate(name, scenario: generation.Scenario):
+    start = time.process_time()
     trades, model, popt = my_solver.solve(
-        scenario.get_train_price(), scenario.test_size
+        0, scenario.train_signal, scenario.test_size, scenario.sine_count
     )
+    end = time.process_time()
+    print(f"Took {end - start:.2f}s. Parameters: {scenario.model_parameters}")
+
     amount = trade_simulator.simulate(scenario.test_signal, scenario.train_size, trades)
     optimal_trades = list(trade_optimizer.get_optimal_trades(scenario.test_signal))
     optimal_amount = trade_simulator.simulate(scenario.test_signal, 0, optimal_trades)
     fig = plt.figure()
-    fig.set_size_inches(9, 4)
-    plt.plot(scenario.get_train_price(), "g")
-    test_x = np.arange(scenario.test_size) + scenario.train_size
-    model_y = model(test_x)
-    plt.plot(test_x, scenario.test_signal, "y")
-    plt.plot(test_x, model_y, "b")
-    x_full = np.arange(scenario.size)
-    plt.plot(x_full, scenario.signal - model(x_full), "m")
+    fig.set_size_inches(16, 4)
+    plt.plot(scenario.train_signal, "g")
+    x_train = np.arange(scenario.train_size)
+    x_test = np.arange(scenario.test_size) + scenario.train_size
+    plt.plot(x_test, scenario.test_signal, "y")
+    plt.savefig(f"art/{name}.png")
+
+    test_model = model(x_test)
+    plt.plot(x_test, test_model, "b")
+
     # line_min = scenario.test_signal.min()
     # line_max = scenario.test_signal.max()
     # plt.vlines(trades[::2], line_min, line_max, "y", "--")
     # plt.vlines(trades[1::2], line_min, line_max, "m", "--")
-    plt.savefig(f"art/{name}.png")
-    if amount < optimal_amount:
-        print(f"{name}")
+
+    if amount / optimal_amount < 0.99:
+        plt.plot(x_train, scenario.train_signal - model(x_train), "m")
+        plt.plot(x_test, scenario.test_signal - test_model, "m")
         print(f"Amount is {amount:.2f}, max_amount is {optimal_amount:.2f}")
         print(f"Model options: {popt}")
         # print(f"Trades: {trades}")
@@ -43,81 +51,94 @@ def simulate(name, scenario):
         print()
 
 
-def display_scenarios(names, scenarios):
-    for name, scenario in zip(names, scenarios):
-        simulate(name, scenario)
-        print(name, " + ".join(scenario.signal_description))
-
+def display_scenarios(scenarios):
     challenge_input = evaluate.create_challenge_input(scenarios)
-    # print(pprint.pprint(challenge_input, width=120, compact=True))
+    pprint.PrettyPrinter(width=120, compact=True).pprint(challenge_input)
+
+    for i, scenario in enumerate(scenarios):
+        name = str(i + 1)
+        print(name)
+        simulate(name, scenario)
 
 
-display_scenarios(["one", "two", "three", "four"], generation.get_standard_scenarios(0))
+display_scenarios(generation.get_standard_scenarios(1))
 
 #%%
+import importlib
 from scipy.optimize import curve_fit
 import numpy as np
 import matplotlib.pyplot as plt
 import pprint
 from scipy.optimize import differential_evolution
-from app.generation import ScenarioBuilder
+from app import generation, trade_simulator, trade_optimizer
+
+importlib.reload(generation)
 
 
 def test_curve_fit():
-    x = np.arange(100)
     scenario = (
-        ScenarioBuilder(2, 100, 1000).add_base().add_trend().add_waves(4).add_noise()
+        generation.ScenarioBuilder(2, 100, 1000)
+        .set_base()
+        .set_trend()
+        .add_waves(4)
+        .build()
     )
-    y = scenario.get_train_price()
-    plt.plot(y)
+    y_train = (
+        scenario.train_signal
+    )  # + 5 * np.random.standard_normal(scenario.train_size)
+    x_train = np.arange(scenario.train_size)
+    plt.plot(y_train)
 
-    def model(
-        xx,
-        base,
-        trend,
-        scale0,
-        period0,
-        scale1,
-        period1,
-        scale2,
-        period2,
-        scale3,
-        period3,
-    ):
-        result = base + trend * xx / x.shape[0]
-        for scale, period in (
-            (scale0, period0),
-            (scale1, period1),
-            (scale2, period2),
-            (scale3, period3),
-        ):
-            result += scale * np.sin(xx * 2 * np.pi / period)
+    x_scale = 1 / (scenario.size - 1)
+    # pylint: disable=too-many-arguments,invalid-name
+    def model(x, base, trend, *waves):
+        """
+        x: [0, n)
+        waves: scale_i, period_i        
+        """
+        result = base + trend * x_scale * x
+
+        for scale, period_count in zip(waves[::2], waves[1::2]):
+            result += scale * np.sin(2 * np.pi * period_count * x_scale * x)
+
         return result
 
-    # function for genetic algorithm to minimize (sum of squared error)
-    def sumOfSquaredError(parameterTuple):
-        return np.sum((y - model(x, *parameterTuple)) ** 2.0)
+    def error(model_parameters):
+        return np.sum((y_train - model(x_train, *model_parameters)) ** 2.0)
 
     def generate_initial_parameter():
         parameter_bounds = []
         parameter_bounds.append([200, 300])
         parameter_bounds.append([-100, 100])
-        argcount = model.__code__.co_argcount - 3
-        for _ in range(0, argcount, 2):
-            parameter_bounds.append([5, 15])
+        max_wave_count = 4
+        for _ in range(max_wave_count):
+            parameter_bounds.append([0, 20])
             parameter_bounds.append([20, 40])
 
-        result = differential_evolution(
-            sumOfSquaredError, parameter_bounds, seed=3, maxiter=100
-        )
+        result = differential_evolution(error, parameter_bounds)
         return result.x
 
     initial_parameters = generate_initial_parameter()
 
-    topt, tcov = curve_fit(model, x, y, p0=initial_parameters, absolute_sigma=True)
-    pprint.pprint(topt)
-    y_pred = model(x, *topt)
-    plt.plot(y_pred)
+    popt, pcov = curve_fit(model, x_train, y_train, p0=initial_parameters)
+    print("Expected:", scenario.model_parameters)
+    print("Actual:", popt)
+    x_test = np.arange(scenario.train_size, scenario.size)
+    y_pred = model(x_test, *popt)
+    plt.plot(x_test, y_pred)
+    plt.plot(x_test, scenario.test_signal)
+    plt.plot(x_test, y_pred - scenario.test_signal)
+
+    optimal_trades = list(trade_optimizer.get_optimal_trades(scenario.test_signal))
+    print("Optimal trades:", optimal_trades)
+
+    max_amount = trade_simulator.simulate(scenario.test_signal, 0, optimal_trades)
+
+    amount = trade_simulator.simulate(
+        scenario.test_signal, 0, list(trade_optimizer.get_optimal_trades(y_pred))
+    )
+
+    print(f"Amount max: {max_amount:.2f}, actual: {amount:.2f}")
 
 
 test_curve_fit()
