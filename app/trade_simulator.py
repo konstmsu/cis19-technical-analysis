@@ -33,3 +33,9 @@ def simulate(signal: np.ndarray, zero_trade: int, trades: Collection[int]):
 
 def get_score(optimal_result, result):
     return min(1, max(0, (result - 1) / (optimal_result - 1)))
+
+
+def get_cooridnator_score(scores):
+    weights = np.asarray([1, 2, 3, 4])
+    scores = np.clip(np.asarray(scores), 0, 1)
+    return 100 / sum(weights) * np.sum(scores * weights)

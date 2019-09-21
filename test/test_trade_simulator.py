@@ -1,6 +1,6 @@
 import pytest
 
-from app.trade_simulator import simulate
+from app.trade_simulator import simulate, get_score, get_cooridnator_score
 
 
 def test_simple():
@@ -43,3 +43,25 @@ def test_out_of_range():
 
     with pytest.raises(Exception, match=r"Trade 11 must be in \[100, 102\)"):
         simulate([42, 43], 100, [11])
+
+
+def test_get_score():
+    assert get_score(10, 10) == 1
+    assert get_score(8, 1) == 0
+    assert get_score(8, 0.25) == 0
+    assert get_score(3, 2) == 0.5
+    assert get_score(4, 2) == 1 / 3
+
+
+def test_get_total_score():
+    assert get_cooridnator_score([1, 0, 0, 0]) == 10
+    assert get_cooridnator_score([0, 1, 0, 0]) == 20
+    assert get_cooridnator_score([0, 0, 1, 0]) == 30
+    assert get_cooridnator_score([0, 0, 0, 1]) == 40
+    assert get_cooridnator_score([1, 1, 1, 1]) == 100
+    assert get_cooridnator_score([1, 1, 1, 0.5]) == 80
+    assert get_cooridnator_score([1, 1, 0.5, 0.5]) == 65
+    assert get_cooridnator_score([0.97, 0.97, 0.97, 0.97]) == 97
+
+    assert get_cooridnator_score([100, 0, 0, 0]) == 10
+    assert get_cooridnator_score([0, 0, 0, -500]) == 0

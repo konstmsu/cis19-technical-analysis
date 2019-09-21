@@ -1,4 +1,5 @@
 from typing import List, Collection, Dict
+import random
 
 import requests
 from flask import request, current_app, Blueprint, jsonify
@@ -47,9 +48,7 @@ def create_challenge_input(scenarios) -> ChallengeInput:
 
 
 def execute_team_solution(team_url, run_id):
-    # TODO Loop over a range of scenarios and get combined score
-    # TODO Use random seed
-    scernarios = generation.get_standard_scenarios(0)
+    scernarios = generation.get_standard_scenarios(random.randrange(1_000_000_000))
     url = team_url + "/technical-analysis"
     challenge_input = create_challenge_input(scernarios)
     current_app.logger.info("Posting to %s input %s", url, challenge_input)
@@ -59,18 +58,15 @@ def execute_team_solution(team_url, run_id):
     return calculate_score(run_id, scernarios, results)
 
 
-WEIGHTS = [1, 2, 3, 4]
-
-
 def calculate_score(
     run_id: str,
     scenarios: Collection[generation.Scenario],
     results: Collection[Collection[int]],
 ):
-    total_score = 0
-    assert len(WEIGHTS) == len(scenarios)
+    assert len(results) == len(scenarios), f"Expected {len(scenarios)} results"
     messages = []
-    for weight, scenario, trades in zip(WEIGHTS, scenarios, results):
+    scores = []
+    for scenario, trades in zip(scenarios, results):
         money = trade_simulator.simulate(
             scenario.test_signal, scenario.train_size, trades
         )
@@ -79,11 +75,13 @@ def calculate_score(
         max_money = trade_simulator.simulate(scenario.test_signal, 0, optimal_trades)
 
         score = trade_simulator.get_score(max_money, money)
-        total_score += score * weight
+        scores.append(score)
 
         # pylint: disable=line-too-long
         messages.append(
             f"Scored {score:.2f}. Got money {money:.2f}, max {max_money:.2f}. Optimal trades: {optimal_trades}"
         )
 
-    return {"runId": run_id, "score": total_score * 100, "message": "\n".join(messages)}
+    coordinator_score = trade_simulator.get_cooridnator_score(scores)
+
+    return {"runId": run_id, "score": coordinator_score, "message": "\n".join(messages)}
