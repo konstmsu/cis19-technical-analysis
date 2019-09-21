@@ -1,7 +1,7 @@
 image: python:3.7.3
 
 variables:
-    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
 
 stages:
   - test
@@ -15,9 +15,9 @@ test:
   script:
     - ./install_requirements_dev.sh
     - . ./venv/bin/activate
-    - mypy .
     - pytest
-    - ./lint.sh --disable=fixme,unused-argument
+    - mypy .
+    - ./lint.sh --disable=fixme,unused-argument,duplicate-code
 
 production:
   stage: deploy
