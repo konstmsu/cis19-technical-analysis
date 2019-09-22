@@ -76,7 +76,7 @@ def get_standard_scenarios(random_seed: int) -> List[Scenario]:
     rnd = np.random.RandomState(random_seed)
 
     def next_seed():
-        return rnd.randint(2 ** 32 - 1)
+        return rnd.randint(1_000_000_000)
 
     def create_builder(train_size, test_size):
         return (
