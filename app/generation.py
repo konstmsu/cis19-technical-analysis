@@ -13,9 +13,7 @@ class Scenario:
         self.model = model
 
         signal = model(np.arange(self.size), *model_parameters)
-        self.train_signal = np.round(signal[:train_size]).astype(
-            np.int32, casting="unsafe"
-        )
+        self.train_signal = signal[:train_size].astype(np.int32, casting="unsafe")
         self.test_signal = signal[-test_size:]
 
         assert self.train_signal.shape[0] + self.test_signal.shape[0] == self.size

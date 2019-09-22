@@ -5,7 +5,7 @@ import numpy as np
 
 from app.generation import get_standard_scenarios
 from app.trade_optimizer import get_optimal_trades
-from app.trade_simulator import simulate, get_score
+from app import evaluate
 
 
 def do_test(values, expected_optimal_trades):
@@ -39,35 +39,26 @@ def test_files(snapshot):
 
 # pylint: disable=cell-var-from-loop
 def test_brute():
-    scores = {}
     for seed in range(100):
-        for i, scenario in enumerate(get_standard_scenarios(seed)):
-            optimal_trades = list(get_optimal_trades(scenario.test_signal))
-            optimal_result = simulate(scenario.test_signal, 0, optimal_trades)
+        scenarios = get_standard_scenarios(seed)
 
-            description = f"Seed {seed}, scenario {i}"
+        def test(name, results):
+            score100 = evaluate.calculate_score(
+                f"{name} test seed {seed}", scenarios, results
+            )["score"]
+            assert score100 < 5, f"{name} brute, seed {seed}"
 
-            def record(name, trades, score_assertion):
-                result = simulate(scenario.test_signal, scenario.train_size, trades)
-                score = get_score(optimal_result, result)
-                assert score_assertion(score), description
-                scores.setdefault(f"{name}_{i}", []).append(score)
-
-            record("empty", [], lambda s: s == 0)
-            record(
-                "all",
-                np.arange(scenario.train_size, scenario.size).tolist(),
-                lambda s: s < 0.2,
-            )
-            record(
-                "random",
-                np.random.RandomState(seed)
-                .randint(scenario.train_size, scenario.size, size=len(optimal_trades))
-                .tolist(),
-                lambda s: s < 0.2,
-            )
-
-    for k in sorted(scores.keys()):
-        print(f"{k} max is {max(scores[k]):.3f}")
+        test("empty", [[] for _ in scenarios])
+        test("all", [np.arange(s.test_size) + s.train_size for s in scenarios])
+        rnd = np.random.RandomState(seed)
+        test(
+            "random",
+            [
+                rnd.randint(
+                    s.train_size, s.size, size=int(2 * sum(s.model_parameters[3::2]))
+                )
+                for s in scenarios
+            ],
+        )
 
     # assert 1 == 2

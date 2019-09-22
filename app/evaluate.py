@@ -49,8 +49,8 @@ def create_challenge_input(scenarios) -> ChallengeInput:
 
 def execute_team_solution(team_url, run_id):
     scernarios = generation.get_standard_scenarios(random.randrange(1_000_000_000))
-    url = team_url + "/technical-analysis"
     challenge_input = create_challenge_input(scernarios)
+    url = team_url + "/technical-analysis"
     current_app.logger.info("Posting to %s input %s", url, challenge_input)
     results = requests.post(url, json=challenge_input).json()
     current_app.logger.info("url: %s, response: %s", url, results)

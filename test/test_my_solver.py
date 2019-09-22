@@ -21,5 +21,5 @@ def test_my_solver():
             quality = result / max_result
             # pylint: disable=line-too-long
             assert (
-                0.97 <= quality <= 1
+                0.93 <= quality <= 1
             ), f"Seed {seed}, scenario {scenario_index}, result {result:.2f}, max {max_result:.2f}, model_parameters {scenario.model_parameters}"
