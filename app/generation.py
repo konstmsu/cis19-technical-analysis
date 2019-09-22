@@ -55,7 +55,7 @@ class ScenarioBuilder:
 
     def _create_period_counts(self, count):
         for _ in range(100):
-            period_counts = np.sort(self.rnd.uniform(11, 100, count))
+            period_counts = np.sort(self.rnd.uniform(10, 100, count))
             if count < 2 or min(np.diff(period_counts)) > 10:
                 return period_counts
         raise Exception(f"Could not come up with {count} periods")
