@@ -1,5 +1,8 @@
 .\venv\Scripts\Activate.ps1
 
+Write-Output instructions.html
+jupyter nbconvert instructions.ipynb
+
 Write-Output mypy...
 mypy . 
 
@@ -8,3 +11,4 @@ pylint app test --ignore="venv,test\snapshots" --disable="fixme,duplicate-code"
 
 Write-Output pytest...
 pytest --quiet
+

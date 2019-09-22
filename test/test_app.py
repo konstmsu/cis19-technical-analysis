@@ -18,7 +18,7 @@ def client():
 def test_instructions(client):
     for url in ["/", "/instructions"]:
         response = client.get(url, follow_redirects=True)
-        assert b"Build trading strategy" in response.data
+        assert b"family of functions" in response.data
 
 
 @responses.activate

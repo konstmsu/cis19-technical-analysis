@@ -6,7 +6,6 @@ matplotlib
 pylint
 snapshottest
 pytest
-markdown
 requests
 responses
 black
