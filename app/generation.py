@@ -71,7 +71,7 @@ class ScenarioBuilder:
         return self
 
 
-def get_standard_scenarios(random_seed: int) -> List[Scenario]:
+def get_standard_scenarios(random_seed: int, train_size: int = 100, test_size: int = 1000) -> List[Scenario]:
     rnd = np.random.RandomState(random_seed)
 
     def next_seed():
@@ -93,8 +93,8 @@ def get_standard_scenarios(random_seed: int) -> List[Scenario]:
         raise Exception("couldn't create satisfactory scenario")
 
     return [
-        get_satisfactory(100, 1000, lambda b: b.add_waves(1)),
-        get_satisfactory(100, 1000, lambda b: b.add_waves(2)),
-        get_satisfactory(100, 1000, lambda b: b.add_waves(3)),
-        get_satisfactory(100, 1000, lambda b: b.add_waves(4)),
+        get_satisfactory(train_size, test_size, lambda b: b.add_waves(1)),
+        get_satisfactory(train_size, test_size, lambda b: b.add_waves(2)),
+        get_satisfactory(train_size, test_size, lambda b: b.add_waves(3)),
+        get_satisfactory(train_size, test_size, lambda b: b.add_waves(4)),
     ]

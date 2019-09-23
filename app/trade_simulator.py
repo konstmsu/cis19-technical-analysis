@@ -1,4 +1,5 @@
 from typing import Collection
+import math
 
 import numpy as np
 
@@ -38,4 +39,4 @@ def get_score(optimal_result, result):
 def get_cooridnator_score(scores) -> int:
     weights = np.asarray([1, 2, 3, 4])
     scores = np.clip(np.asarray(scores), 0, 1)
-    return 100 / sum(weights) * np.sum(scores * weights)
+    return int(math.ceil(100 / sum(weights) * np.sum(scores * weights)))
