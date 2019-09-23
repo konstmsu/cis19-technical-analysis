@@ -4,7 +4,7 @@ import os
 from json import JSONDecodeError
 
 import requests
-from flask import request, current_app, Blueprint, Response
+from flask import request, current_app, Blueprint
 
 from . import generation
 from . import trade_optimizer
@@ -69,7 +69,7 @@ def execute_team_solution(
     challenge_input: ChallengeInput = create_challenge_input(scenarios)
     solver_url = team_url + "/technical-analysis"
     current_app.logger.info("Posting to %s input %s", solver_url, challenge_input)
-    response: Response = requests.post(solver_url, json=challenge_input)
+    response: requests.models.Response = requests.post(solver_url, json=challenge_input)
     current_app.logger.info("solver_url: %s, response: %s", solver_url, response.text)
 
     def create_error_response(error):

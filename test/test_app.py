@@ -63,9 +63,10 @@ class _EvaluationContext:
         return evaluate_call
 
 
+# pylint: disable=too-many-arguments
 def _test_solver_result(
     test_client,
-    solver_status_code: 200 | 500,
+    solver_status_code: int,
     solver_result,
     expected_score: int,
     expected_message: str,

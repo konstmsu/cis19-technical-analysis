@@ -71,7 +71,9 @@ class ScenarioBuilder:
         return self
 
 
-def get_standard_scenarios(random_seed: int, train_size: int = 100, test_size: int = 1000) -> List[Scenario]:
+def get_standard_scenarios(
+    random_seed: int, train_size: int = 100, test_size: int = 1000
+) -> List[Scenario]:
     rnd = np.random.RandomState(random_seed)
 
     def next_seed():
