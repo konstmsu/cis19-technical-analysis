@@ -22,7 +22,7 @@ test:
 test:
   stage: test
   script:
-    - git remote add heroku-personal https://git.heroku.com/cis19-dr2-technical-analysis.git
+    - git remote add heroku-personal https://heroku:$HEROKU_API_KEY@git.heroku.com/cis19-dr2-technical-analysis.git
     - git push -f heroku-personal HEAD:master
 
 production:
