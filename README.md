@@ -10,4 +10,7 @@ TODO:
 
 - hide code on instructions page
 - generate more training data (?)
+- add smaller sample to instructions page
 - add timeout information on insturctions page
+- check max message size
+- check solution return code and return 0 to cooridnator on exception
