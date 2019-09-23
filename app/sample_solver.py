@@ -14,10 +14,3 @@ def solve():
     ]
     current_app.logger.info("Output: %s", result)
     return jsonify(result)
-
-
-@BLUEPRINT.route("/evaluate-callback", methods=["POST"])
-def evaluate_callback():
-    data = request.get_json()
-    current_app.logger.info("Evaluate callback: %s", data)
-    return jsonify({"ok": "yes!"})
