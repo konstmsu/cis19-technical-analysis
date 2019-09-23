@@ -161,7 +161,9 @@ def test_solution_not_json_mime(client):
     )
     context.add_evaluate_callback(200)
     evaluate = context.evaluate(use_test_challenge=True)
-    expected_body = """{"runId": "142", "score": 5, "message": "Scored 0.45"""
+    expected_body = (
+        """{"runId": "142", "score": 5, "message": "Scenario 1 score is 0.45"""
+    )
     assert evaluate.request.body.decode("ascii").startswith(expected_body)
 
 
@@ -173,9 +175,9 @@ def test_solution(client):
         [[11, 13, 20, 23], [25, 29], [10, 11, 20, 21, 22, 23, 25], [15, 21, 27, 28]],
         42,
         """\
-Scored 0.45. Got money 1.26, max 1.58. Optimal trades: [11, 13, 16, 18, 20, 23, 25, 28]\\n\
-Scored 1.00. Got money 1.01, max 1.01. Optimal trades: [25, 29]\\n\
-Scored 0.13. Got money 1.05, max 1.37. Optimal trades: [10, 11, 12, 13, 15, 18, 20, 21, 22, 23, 25, 26]\\n\
-Scored 0.32. Got money 1.24, max 1.74. Optimal trades: [10, 12, 13, 14, 15, 21, 22, 23, 24, 26, 27, 28]""",
+Scenario 1 score is 0.45, amounts are 1.26 / 1.58. \
+Scenario 2 score is 1.00, amounts are 1.01 / 1.01. \
+Scenario 3 score is 0.13, amounts are 1.05 / 1.37. \
+Scenario 4 score is 0.32, amounts are 1.24 / 1.74""",
         use_test_challenge=True,
     )

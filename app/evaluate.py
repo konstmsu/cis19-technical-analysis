@@ -1,6 +1,5 @@
 from typing import Collection, List
 import random
-import os
 from json import JSONDecodeError
 
 import requests
@@ -120,11 +119,11 @@ def calculate_score(
 
         # pylint: disable=line-too-long
         messages.append(
-            f"Scored {score:.2f}. Got money {money:.2f}, max {max_money:.2f}. Optimal trades: {optimal_trades}"
+            f"Scenario {scenario.sine_count} score is {score:.2f}, amounts are {money:.2f} / {max_money:.2f}"
         )
 
     coordinator_score = trade_simulator.get_cooridnator_score(scores)
 
     return create_evaluate_callback_response(
-        run_id, coordinator_score, os.linesep.join(messages)
+        run_id, coordinator_score, ". ".join(messages)
     )
