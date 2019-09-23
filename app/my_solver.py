@@ -9,7 +9,7 @@ from app.trade_optimizer import get_optimal_trades
 def solve(
     random_seed: int, train_signal: np.ndarray, test_size: int, max_wave_count: int
 ) -> Tuple[List[int], Callable[[np.ndarray], np.ndarray], Dict]:
-    train_signal = train_signal.astype(np.float32)
+    train_signal = np.asarray(train_signal).astype(np.float32)
     train_size = train_signal.shape[0]
     train_x = np.arange(train_size)
     size = train_size + test_size

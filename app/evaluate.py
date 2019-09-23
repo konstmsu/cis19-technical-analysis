@@ -1,4 +1,4 @@
-from typing import List, Collection, Dict
+from typing import Collection, List
 import random
 
 import requests
@@ -10,8 +10,7 @@ from . import trade_simulator
 
 BLUEPRINT = Blueprint("evaluate", __name__)
 
-# TODO Utilize TypedDict when Python 3.8 is released
-ChallengeInput = List[Dict]
+ChallengeInput = List[List[int]]
 
 
 @BLUEPRINT.route("/test")
