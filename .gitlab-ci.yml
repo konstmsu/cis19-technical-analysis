@@ -19,8 +19,14 @@ test:
     - mypy .
     - ./lint.sh --disable=fixme,unused-argument,duplicate-code
 
+test:
+  stage: test
+  script:
+    - git remote add heroku-personal https://git.heroku.com/cis19-dr2-technical-analysis.git
+    - git push -f heroku-personal HEAD:master
+
 production:
   stage: deploy
   script:
-    - git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/cis19-dr2-technical-analysis.git
+    - git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/cis2019-technical-analysis.git
     - git push -f heroku HEAD:master
