@@ -14,3 +14,4 @@ TODO:
 - add timeout information on insturctions page
 - check max message size
 - check solution return code and return 0 to cooridnator on exception
+- test in both HK and SG
