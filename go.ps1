@@ -1,7 +1,7 @@
 .\venv\Scripts\Activate.ps1
 
 Write-Output instructions.html
-jupyter nbconvert instructions.ipynb
+jupyter nbconvert --no-input instructions.ipynb
 
 Write-Output mypy...
 mypy . 
