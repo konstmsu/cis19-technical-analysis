@@ -5,7 +5,7 @@ set -euo pipefail
 . ./venv/bin/activate
 
 echo instructions.html
-jupyter nbconvert instructions.ipynb
+jupyter nbconvert --no-input instructions.ipynb
 
 echo mypy...
 mypy . 

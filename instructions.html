@@ -13243,7 +13243,7 @@ score_i = \max(0, \dfrac{final\_cash_i - 1}{max\_final\_cash_i - 1})
 <li><strong>final_cash</strong> - final amount of cash after trading on your recommendations</li>
 <li><strong>max_final_cash</strong> - final amount of cash after trading on optimal strategy a.k.a. "buy low, sell high"</li>
 </ul>
-<p>Total score is a weighted sum of the scenario scores:
+<p>Total score is a ceiling of a weighted sum of the scenario scores:
 \begin{align}
 total\_coorinator\_score = \lceil{100 * \sum_{i=1}^{scenario\_count} weight_i * score_i}\rceil
 \end{align}</p>
@@ -13263,13 +13263,14 @@ total\_coorinator\_score = \lceil{100 * \sum_{i=1}^{scenario\_count} weight_i * 
 \\&amp;period\_count_i \in [10, 100)
 \\&amp;price_t &gt; 0
 \end{align*}</p>
-<h3 id="Output">Output<a class="anchor-link" href="#Output">&#182;</a></h3><p>List of trade recommendations for each <strong>test data</strong> sequence. Every <strong>test data</strong> sequence is indexed [100, 1099] hence every trade recommendation is assumed to contain a sequence of alternating buy-sell indexes, monotonically increasing and contained within [100, 1099]</p>
+<h3 id="Output">Output<a class="anchor-link" href="#Output">&#182;</a></h3><p>List of trade recommendations for each <strong>test data</strong> sequence. Every <strong>test data</strong> sequence contains 1,000 values indexed [100, 1099] hence every trade recommendation is assumed to be a sequence of alternating buy-sell indexes, monotonically increasing and contained within [100, 1099]</p>
+<h5 id="Rules">Rules<a class="anchor-link" href="#Rules">&#182;</a></h5><p>Initial amount of cash is 1 and the first trade is always a "buy".</p>
 <p>Every trade is full, i.e.:</p>
 <ul>
 <li>buy converts all cash to stock</li>
 <li>sell converts all stock back to cash</li>
 </ul>
-<p>If the last recommended trade is a buy, then a sell will be implied at the index 1099.</p>
+<p>If the last recommended trade is a "buy" (i.e. recommendation contains odd number of indexes), then a sell will be implied at the index 1099.</p>
 <p>Solution timeout is 28 seconds.</p>
 <h4 id="Sample-Input">Sample Input<a class="anchor-link" href="#Sample-Input">&#182;</a></h4>
 </div>

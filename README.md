@@ -8,12 +8,12 @@ Developed by Konstantin Spirin for CodeIT Suisse 2019.
 
 TODO:
 
-- hide code on instructions page
-- generate more training data (?)
-- add timeout information on instructions page
-- test in both HK and SG
 - handle timeouts
 - include content into non-200 errors
+- generate more training data, maybe even provide Python snippet?
+- test in both HK and SG
+- ✓ hide code on instructions page
+- ✓ add timeout information on instructions page
 - ✓ document that score_i is never less than 0
 - ✓ document "ceil" in scoring in instructions
 - ✓ add smaller sample to the instructions page
