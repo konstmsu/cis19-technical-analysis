@@ -8,7 +8,6 @@ Developed by Konstantin Spirin for CodeIT Suisse 2019.
 
 TODO:
 
-- ! First image is not rendered on instructions page
 - Add instructions page link to confluence
 - Handle timeouts
 - Log model parameters
@@ -16,6 +15,7 @@ TODO:
 - Test in both HK and SG
 - Create evaluator notebook
 - Script to clone all repos from heroku?
+- ✓ ! First image is not rendered on instructions page
 - ✓ Include content into non-200 errors
 - ✓ Instructions page title should mention "Technical Analysis"
 - ✓ Problem visualization at the beginning?
