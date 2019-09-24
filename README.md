@@ -8,6 +8,7 @@ Developed by Konstantin Spirin for CodeIT Suisse 2019.
 
 TODO:
 
+- ! First image is not rendered on instructions page
 - Add instructions page link to confluence
 - Handle timeouts
 - Log model parameters
