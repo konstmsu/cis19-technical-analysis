@@ -13146,7 +13146,7 @@ t \in [0, 1]\&gt;evenly\&gt;spaced\&gt;on\&gt;the\&gt;full\&gt;index\&gt;range
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimal trades - the output you need to produce (alternating green and red lines in the image below):&quot;</span><span class="p">)</span>
     <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">([</span><span class="n">scenario</span><span class="o">.</span><span class="n">train_size</span> <span class="o">+</span> <span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">optimal_trades</span><span class="p">],</span> <span class="n">compact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>    
     <span class="nb">print</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Max final cash amount is </span><span class="si">{money:.2f}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Max final amount of cash is </span><span class="si">{money:.2f}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">()</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">scenario</span><span class="o">.</span><span class="n">model_parameters</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This example uses the following function family parameters:&quot;</span><span class="p">)</span>
@@ -13188,7 +13188,7 @@ Test data - floating point values (orange line in the image below):
 Optimal trades - the output you need to produce (alternating green and red lines in the image below):
 [30, 38, 51, 68, 80, 89]
 
-Max final cash amount is 1.09
+Max final amount of cash is 1.09
 
 This example uses the following function family parameters:
 Base=241.0, trend=20.0, scale_1=4.0, period_count_1=3.0, sine_count=1
@@ -13236,16 +13236,16 @@ Base=241.0, trend=20.0, scale_1=4.0, period_count_1=3.0, sine_count=1
 </table>
 <p>Assuming the initial amount of cash is 1, scenario score is:
 \begin{equation}
-score_i = \dfrac{final\_amount_i - 1}{max\_final\_amount_i - 1}
+score_i = \max(0, \dfrac{final\_cash_i - 1}{max\_final\_cash_i - 1})
 \end{equation}</p>
 <p>where</p>
 <ul>
-<li><strong>final_amount</strong> - final amount of cash after trading on your recommendations</li>
-<li><strong>max_final_amount</strong> - final amount of cash after trading on optimal strategy a.k.a. "buy low, sell high"</li>
+<li><strong>final_cash</strong> - final amount of cash after trading on your recommendations</li>
+<li><strong>max_final_cash</strong> - final amount of cash after trading on optimal strategy a.k.a. "buy low, sell high"</li>
 </ul>
 <p>Total score is a weighted sum of the scenario scores:
 \begin{align}
-total\_coorinator\_score = 100 * \sum_{i=1}^{scenario\_count} weight_i * score_i
+total\_coorinator\_score = \lceil{100 * \sum_{i=1}^{scenario\_count} weight_i * score_i}\rceil
 \end{align}</p>
 
 </div>
@@ -13264,12 +13264,13 @@ total\_coorinator\_score = 100 * \sum_{i=1}^{scenario\_count} weight_i * score_i
 \\&amp;price_t &gt; 0
 \end{align*}</p>
 <h3 id="Output">Output<a class="anchor-link" href="#Output">&#182;</a></h3><p>List of trade recommendations for each <strong>test data</strong> sequence. Every <strong>test data</strong> sequence is indexed [100, 1099] hence every trade recommendation is assumed to contain a sequence of alternating buy-sell indexes, monotonically increasing and contained within [100, 1099]</p>
-<p>Every trade utilizes all available resources, i.e.:</p>
+<p>Every trade is full, i.e.:</p>
 <ul>
 <li>buy converts all cash to stock</li>
 <li>sell converts all stock back to cash</li>
 </ul>
 <p>If the last recommended trade is a buy, then a sell will be implied at the index 1099.</p>
+<p>Solution timeout is 28 seconds.</p>
 <h4 id="Sample-Input">Sample Input<a class="anchor-link" href="#Sample-Input">&#182;</a></h4>
 </div>
 </div>
