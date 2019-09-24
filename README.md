@@ -12,6 +12,12 @@ TODO:
 - include content into non-200 errors
 - generate more training data, maybe even provide Python snippet?
 - test in both HK and SG
+- Create evaluator notebook
+- Log model parameters
+- Add instructions page link to confluence
+- Script to clone all repos from heroku?
+- ✓ Problem visualization at the beginning?
+- ✓ Cpu resources for solvers - they host wherever they want
 - ✓ hide code on instructions page
 - ✓ add timeout information on instructions page
 - ✓ document that score_i is never less than 0
