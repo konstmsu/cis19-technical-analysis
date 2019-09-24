@@ -13098,75 +13098,11 @@ t \in [0, 1]\&gt;evenly\&gt;spaced\&gt;on\&gt;the\&gt;full\&gt;index\&gt;range
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">importlib</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">app</span> <span class="k">import</span> <span class="n">generation</span><span class="p">,</span> <span class="n">trade_optimizer</span>
-<span class="kn">import</span> <span class="nn">pprint</span>
-
-<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">generation</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">show_sample</span><span class="p">():</span>
-    <span class="n">builder</span> <span class="o">=</span> <span class="n">generation</span><span class="o">.</span><span class="n">ScenarioBuilder</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">train_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
-    <span class="n">builder</span><span class="o">.</span><span class="n">set_base</span><span class="p">()</span><span class="o">.</span><span class="n">set_trend</span><span class="p">((</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span><span class="o">.</span><span class="n">add_waves</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">period_count_range</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">scale_range</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-    <span class="n">scenario</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
-    <span class="n">optimal_trades</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">trade_optimizer</span><span class="o">.</span><span class="n">get_optimal_trades</span><span class="p">(</span><span class="n">scenario</span><span class="o">.</span><span class="n">test_signal</span><span class="p">))</span>
-
-    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Illustrative example of sine_count=1 with </span><span class="si">{scenario.train_size}</span><span class="s2"> values of training data and </span><span class="si">{scenario.test_size}</span><span class="s2"> values of test data&quot;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">scenario</span><span class="o">.</span><span class="n">train_size</span><span class="p">),</span> <span class="n">scenario</span><span class="o">.</span><span class="n">train_signal</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scenario</span><span class="o">.</span><span class="n">train_size</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">scenario</span><span class="o">.</span><span class="n">test_size</span><span class="p">),</span> <span class="n">scenario</span><span class="o">.</span><span class="n">test_signal</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">)</span>
-    <span class="n">min_y</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">scenario</span><span class="o">.</span><span class="n">train_signal</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">scenario</span><span class="o">.</span><span class="n">test_signal</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
-    <span class="n">money</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">trade</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">optimal_trades</span><span class="p">):</span>
-        <span class="n">price</span> <span class="o">=</span> <span class="n">scenario</span><span class="o">.</span><span class="n">test_signal</span><span class="p">[</span><span class="n">trade</span><span class="p">]</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">scenario</span><span class="o">.</span><span class="n">train_size</span> <span class="o">+</span> <span class="n">trade</span>
-        <span class="n">isSell</span> <span class="o">=</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">price</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="s1">&#39;red&#39;</span><span class="p">][</span><span class="n">isSell</span><span class="p">])</span>
-        <span class="k">if</span> <span class="n">isSell</span><span class="p">:</span>
-            <span class="n">money</span> <span class="o">=</span> <span class="n">price</span> <span class="o">*</span> <span class="n">security</span>
-            <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;sell index </span><span class="si">{x}</span><span class="s2">, price </span><span class="si">{price:.1f}</span><span class="s2"> =&gt; </span><span class="si">{money:,.2f}</span><span class="s2"> cash&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">security</span> <span class="o">=</span> <span class="n">money</span> <span class="o">/</span> <span class="n">price</span>
-            <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;buy index </span><span class="si">{x}</span><span class="s2">, price </span><span class="si">{price:.1f}</span><span class="s2">&quot;</span>
-            
-        <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mf">0.3</span><span class="p">,</span><span class="n">min_y</span><span class="p">,</span><span class="n">text</span><span class="p">,</span><span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
-        
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Train data - your input (blue line in the image below):&quot;</span><span class="p">)</span>
-    <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">scenario</span><span class="o">.</span><span class="n">train_signal</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">compact</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test data - floating point values (orange line in the image below):&quot;</span><span class="p">)</span>
-    <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">scenario</span><span class="o">.</span><span class="n">test_signal</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">compact</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimal trades - the output you need to produce (alternating green and red lines in the image below):&quot;</span><span class="p">)</span>
-    <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">([</span><span class="n">scenario</span><span class="o">.</span><span class="n">train_size</span> <span class="o">+</span> <span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">optimal_trades</span><span class="p">],</span> <span class="n">compact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>    
-    <span class="nb">print</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Max final amount of cash is </span><span class="si">{money:.2f}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">()</span>
-    <span class="n">m</span> <span class="o">=</span> <span class="n">scenario</span><span class="o">.</span><span class="n">model_parameters</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This example uses the following function family parameters:&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Base=</span><span class="si">{m[0]}</span><span class="s2">, trend=</span><span class="si">{m[1]}</span><span class="s2">, scale_1=</span><span class="si">{m[2]:.1f}</span><span class="s2">, period_count_1=</span><span class="si">{m[3]}</span><span class="s2">, sine_count=</span><span class="si">{scenario.sine_count}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="n">show_sample</span><span class="p">()</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
 
 <div class="output_wrapper">
 <div class="output">
 
-
 <div class="output_area">
-
-    <div class="prompt"></div>
-
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Train data - your input (blue line in the image below):
@@ -13277,31 +13213,11 @@ total\_coorinator\_score = \lceil{100 * \sum_{i=1}^{scenario\_count} weight_i * 
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pprint</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">app</span> <span class="k">import</span> <span class="n">generation</span><span class="p">,</span> <span class="n">trade_optimizer</span><span class="p">,</span> <span class="n">evaluate</span>
-
-<span class="n">scenarios</span> <span class="o">=</span> <span class="n">generation</span><span class="o">.</span><span class="n">get_standard_scenarios</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">evaluate</span><span class="o">.</span><span class="n">create_challenge_input</span><span class="p">(</span><span class="n">scenarios</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mi">106</span><span class="p">,</span> <span class="n">compact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
 
 <div class="output_wrapper">
 <div class="output">
 
-
 <div class="output_area">
-
-    <div class="prompt"></div>
-
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>[[283, 285, 287, 288, 290, 291, 291, 291, 290, 289, 287, 285, 283, 280, 278, 276, 275, 273, 273, 273, 273,
@@ -13340,26 +13256,11 @@ total\_coorinator\_score = \lceil{100 * \sum_{i=1}^{scenario\_count} weight_i * 
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">optimal_trades</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">train_size</span> <span class="o">+</span> <span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">trade_optimizer</span><span class="o">.</span><span class="n">get_optimal_trades</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">test_signal</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">scenarios</span><span class="p">]</span>
-<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">optimal_trades</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">compact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
 
 <div class="output_wrapper">
 <div class="output">
 
-
 <div class="output_area">
-
-    <div class="prompt"></div>
-
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>[[100, 105, 118, 130, 143, 155, 167, 180, 192, 204, 217, 229, 242, 254, 266, 279, 291, 303, 316, 328, 341, 353, 366,
@@ -13404,30 +13305,11 @@ total\_coorinator\_score = \lceil{100 * \sum_{i=1}^{scenario\_count} weight_i * 
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">scenario</span><span class="p">,</span> <span class="n">optimals</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">scenarios</span><span class="p">,</span> <span class="n">optimal_trades</span><span class="p">):</span>
-    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;sine_count=</span><span class="si">{scenario.sine_count}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">scenario</span><span class="o">.</span><span class="n">train_size</span><span class="p">),</span> <span class="n">scenario</span><span class="o">.</span><span class="n">train_signal</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scenario</span><span class="o">.</span><span class="n">train_size</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">scenario</span><span class="o">.</span><span class="n">test_size</span><span class="p">),</span> <span class="n">scenario</span><span class="o">.</span><span class="n">test_signal</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
 
 <div class="output_wrapper">
 <div class="output">
 
-
 <div class="output_area">
-
-    <div class="prompt"></div>
-
 
 
 
@@ -13441,9 +13323,6 @@ total\_coorinator\_score = \lceil{100 * \sum_{i=1}^{scenario\_count} weight_i * 
 
 <div class="output_area">
 
-    <div class="prompt"></div>
-
-
 
 
 <div class="output_png output_subarea ">
@@ -13456,9 +13335,6 @@ total\_coorinator\_score = \lceil{100 * \sum_{i=1}^{scenario\_count} weight_i * 
 
 <div class="output_area">
 
-    <div class="prompt"></div>
-
-
 
 
 <div class="output_png output_subarea ">
@@ -13470,9 +13346,6 @@ total\_coorinator\_score = \lceil{100 * \sum_{i=1}^{scenario\_count} weight_i * 
 </div>
 
 <div class="output_area">
-
-    <div class="prompt"></div>
-
 
 
 

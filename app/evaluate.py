@@ -75,7 +75,9 @@ def execute_team_solution(
         return create_evaluate_callback_response(run_id, 0, f"Error: {error}")
 
     if response.status_code != 200:
-        return create_error_response(f"Got 500 from solver {solver_url}")
+        return create_error_response(
+            f"Got {response.status_code} from solver {solver_url}. {response.text}"
+        )
 
     try:
         results = response.json()

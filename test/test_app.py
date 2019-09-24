@@ -1,5 +1,6 @@
 # pylint: disable=redefined-outer-name,line-too-long
 
+import json
 import pytest
 import responses
 
@@ -19,7 +20,7 @@ def test_instructions(client):
     for url in ["/", "/instructions"]:
         response = client.get(url, follow_redirects=True)
         assert b"function family" in response.data
-        assert b"Error:" not in response.data
+        assert b'class="input"' not in response.data
 
 
 class _EvaluationContext:
@@ -33,8 +34,8 @@ class _EvaluationContext:
     def solver_url(self):
         return f"{self.team_url}/technical-analysis"
 
-    def add_solver_response(self, status, json):
-        responses.add(responses.POST, self.solver_url, status=status, json=json)
+    def add_solver_response(self, status, body):
+        responses.add(responses.POST, self.solver_url, status=status, body=body)
 
     def add_evaluate_callback(self, status):
         responses.add(
@@ -85,10 +86,10 @@ def _test_solver_result(
 def test_solution_error(client):
     _test_solver_result(
         client,
-        500,
-        None,
+        503,
+        "Some internal error",
         0,
-        "Error: Got 500 from solver https://solver/technical-analysis",
+        "Error: Got 503 from solver https://solver/technical-analysis. Some internal error",
     )
 
 
@@ -99,7 +100,7 @@ def test_solution_wrong_format(client):
         200,
         "some non-json",
         0,
-        "Error: Expected List[List[int]], got <some non-json>",
+        "Error: Failed to parse json <some non-json>. Expecting value: line 1 column 1 (char 0)",
     )
 
 
@@ -108,19 +109,42 @@ def test_solution_wrong_format(client):
 
 @responses.activate
 def test_solution_invalid_json_payload1(client):
-    _test_solver_result(client, 200, "}", 0, "Error: Expected List[List[int]], got <}>")
+    _test_solver_result(
+        client,
+        200,
+        "}",
+        0,
+        "Error: Failed to parse json <}>. Expecting value: line 1 column 1 (char 0)",
+    )
 
 
 @responses.activate
 def test_solution_invalid_json_payload2(client):
     _test_solver_result(
-        client, 200, "[1, 2", 0, "Error: Expected List[List[int]], got <[1, 2>"
+        client,
+        200,
+        "[1, 2",
+        0,
+        "Error: Failed to parse json <[1, 2>. Expecting ',' delimiter: line 1 column 6 (char 5)",
+    )
+
+
+@responses.activate
+def test_solution_invalid_json_payload3(client):
+    _test_solver_result(
+        client,
+        200,
+        json.dumps("[1, 2"),
+        0,
+        "Error: Expected List[List[int]], got <[1, 2>",
     )
 
 
 @responses.activate
 def test_solution_error_numeric_payload(client):
-    _test_solver_result(client, 200, 42, 0, "Error: Expected List[List[int]], got <42>")
+    _test_solver_result(
+        client, 200, json.dumps(42), 0, "Error: Expected List[List[int]], got <42>"
+    )
 
 
 @responses.activate
@@ -135,19 +159,38 @@ def test_solution_empty_payload(client):
 
 
 @responses.activate
-def test_solution_numeric_payload(client):
-    _test_solver_result(client, 200, "", 0, "Error: Expected List[List[int]], got <>")
+def test_solution_empty_string_payload(client):
+    _test_solver_result(
+        client,
+        200,
+        "",
+        0,
+        "Error: Failed to parse json <>. Expecting value: line 1 column 1 (char 0)",
+    )
+
+
+@responses.activate
+def test_solution_empty_string_json_payload(client):
+    _test_solver_result(
+        client, 200, json.dumps(""), 0, "Error: Expected List[List[int]], got <>"
+    )
 
 
 @responses.activate
 def test_solution_empty_list_payload(client):
-    _test_solver_result(client, 200, [], 0, "Error: Expected 4 results, got 0: []")
+    _test_solver_result(
+        client, 200, json.dumps([]), 0, "Error: Expected 4 results, got 0: []"
+    )
 
 
 @responses.activate
 def test_solution_not_enough_results(client):
     _test_solver_result(
-        client, 200, [[], []], 0, "Error: Expected 4 results, got 2: [[], []]"
+        client,
+        200,
+        json.dumps([[], []]),
+        0,
+        "Error: Expected 4 results, got 2: [[], []]",
     )
 
 
@@ -173,7 +216,9 @@ def test_solution(client):
     _test_solver_result(
         client,
         200,
-        [[11, 13, 20, 23], [25, 29], [10, 11, 20, 21, 22, 23, 25], [15, 21, 27, 28]],
+        json.dumps(
+            [[11, 13, 20, 23], [25, 29], [10, 11, 20, 21, 22, 23, 25], [15, 21, 27, 28]]
+        ),
         42,
         """\
 Scenario 1 score is 0.45, amounts are 1.26 / 1.58. \
