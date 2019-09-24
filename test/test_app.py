@@ -18,7 +18,8 @@ def client():
 def test_instructions(client):
     for url in ["/", "/instructions"]:
         response = client.get(url, follow_redirects=True)
-        assert b"family of functions" in response.data
+        assert b"function family" in response.data
+        assert b"Error:" not in response.data
 
 
 class _EvaluationContext:

@@ -5,23 +5,32 @@ import numpy as np
 # pylint: disable=too-many-instance-attributes,too-few-public-methods
 class Scenario:
     def __init__(self, model, model_parameters, train_size: int, test_size: int):
-        self.train_size = train_size
-        self.test_size = test_size
-        self.size = train_size + test_size
-
         self.model_parameters = model_parameters
         self.model = model
 
-        signal = model(np.arange(self.size), *model_parameters)
+        signal = model(np.arange(train_size + test_size), *model_parameters)
+
+        # intentional loss of precision on train signal
         self.train_signal = signal[:train_size].astype(np.int32, casting="unsafe")
-        # Rounding to remove differences between Windows and Linux
-        self.test_signal = np.round(signal[-test_size:], 13)
+        self.test_signal = signal[-test_size:]
 
         assert self.train_signal.shape[0] + self.test_signal.shape[0] == self.size
 
     @property
     def sine_count(self):
         return (len(self.model_parameters) - 2) // 2
+
+    @property
+    def train_size(self):
+        return self.train_signal.shape[0]
+
+    @property
+    def test_size(self):
+        return self.test_signal.shape[0]
+
+    @property
+    def size(self):
+        return self.train_size + self.test_size
 
 
 class ScenarioBuilder:
@@ -44,24 +53,27 @@ class ScenarioBuilder:
 
         return Scenario(model, self.model_parameters, self.train_size, self.test_size)
 
-    def set_base(self):
-        self.model_parameters[0] = self.rnd.uniform(200, 300)
+    def set_base(self, rng=(200, 300)):
+        self.model_parameters[0] = self.rnd.uniform(rng[0], rng[1])
         return self
 
-    def set_trend(self):
-        self.model_parameters[1] = self.rnd.uniform(-100, 100)
+    def set_trend(self, rng=(-100, 100)):
+        self.model_parameters[1] = self.rnd.uniform(rng[0], rng[1])
         return self
 
-    def _create_period_counts(self, count):
+    def _create_period_counts(self, count, period_count_range):
         for _ in range(100):
-            period_counts = np.sort(self.rnd.uniform(10, 100, count))
-            if count < 2 or min(np.diff(period_counts)) > 10:
+            low, high = period_count_range
+            period_counts = np.sort(self.rnd.uniform(low, high, count))
+            if count < 2 or min(np.diff(period_counts)) > low:
                 return period_counts
-        raise Exception(f"Could not come up with {count} periods")
+        raise Exception(
+            f"Could not come up with {count} periods in range ({low}, {high})"
+        )
 
-    def add_waves(self, count: int):
-        scales = self.rnd.uniform(5, 15, count)
-        period_counts = self._create_period_counts(count)
+    def add_waves(self, count: int, scale_range=(5, 15), period_count_range=(10, 100)):
+        scales = self.rnd.uniform(scale_range[0], scale_range[1], count)
+        period_counts = self._create_period_counts(count, period_count_range)
 
         for scale, period_count in zip(scales, period_counts):
             self.model_parameters = np.append(
