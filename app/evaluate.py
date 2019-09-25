@@ -53,17 +53,22 @@ def create_challenge_input(scenarios) -> ChallengeInput:
 
 
 def create_evaluate_callback_response(
-    run_id: str, coordinator_score: int, message: str
+    run_id: str, coordinator_score: int, messages: List[str]
 ) -> EvaluateCallbackPayload:
-    return {"runId": run_id, "score": coordinator_score, "message": message}
+    return {"runId": run_id, "score": coordinator_score, "message": ". ".join(messages)}
 
 
 # pylint: disable=too-many-locals
 def execute_team_solution(
     team_url: str, run_id: str, is_test: bool
 ) -> EvaluateCallbackPayload:
+    messages = []
+    if is_test:
+        messages.append("Test run")
+
     def create_error_response(error):
-        return create_evaluate_callback_response(run_id, 0, f"Error: {error}")
+        messages.append(f"Error: {error}")
+        return create_evaluate_callback_response(run_id, 0, messages)
 
     scenarios = (
         generation.get_standard_scenarios(3, train_size=10, test_size=20)
@@ -74,6 +79,7 @@ def execute_team_solution(
     challenge_input: ChallengeInput = create_challenge_input(scenarios)
     solver_url = team_url + "/technical-analysis"
     current_app.logger.info("Posting to %s input %s", solver_url, challenge_input)
+
     start = time.time()
     timeout = 28
     try:
@@ -84,6 +90,7 @@ def execute_team_solution(
         return create_error_response(f"{solver_url} timed out after {timeout}s")
 
     end = time.time()
+    messages.append(f"Solver finished in {end-start:.1f}s")
 
     current_app.logger.info("solver_url: %s, response: %s", solver_url, response.text)
 
@@ -101,14 +108,9 @@ def execute_team_solution(
         return create_error_response(f"Expected List[List[int]], got <{results}>")
 
     try:
-        messages = []
-        if is_test:
-            messages.append("Test run")
-
-        messages.append(f"Solver finished in {end-start:.1f}s")
         score, score_messages = calculate_coordinator_score(scenarios, results)
         messages += score_messages
-        return create_evaluate_callback_response(run_id, score, ". ".join(messages))
+        return create_evaluate_callback_response(run_id, score, messages)
     except Exception as ex:  # pylint: disable=broad-except
         return create_error_response(ex)
 

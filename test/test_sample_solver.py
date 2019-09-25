@@ -1,23 +1,12 @@
-# pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name,unused-import
 
+from test.flask_testing import test_client
 import responses
-import pytest
-
-from app import create_app
-
-
-@pytest.fixture
-def client():
-    app = create_app()
-    app.config["TESTING"] = True
-
-    with app.test_client() as test_client:
-        yield test_client
 
 
 @responses.activate
-def test_evaluate(client):
-    response = client.post(
+def test_evaluate(test_client):
+    response = test_client.post(
         "/technical-analysis", json=[list(range(20 + i)) for i in range(4)]
     )
 

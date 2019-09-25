@@ -1,26 +1,15 @@
-# pylint: disable=redefined-outer-name,line-too-long
-
 import json
 from typing import cast
-import pytest
+
+# pylint: disable=redefined-outer-name,unused-import
+from test.flask_testing import test_client
 import responses
 import requests
 
-from app import create_app
 
-
-@pytest.fixture
-def client():
-    app = create_app()
-    app.config["TESTING"] = True
-
-    with app.test_client() as test_client:
-        yield test_client
-
-
-def test_instructions(client):
+def test_instructions(test_client):
     for url in ["/", "/instructions"]:
-        response = client.get(url, follow_redirects=True)
+        response = test_client.get(url, follow_redirects=True)
         assert b"function family" in response.data
         assert b'class="input"' not in response.data
 
@@ -67,24 +56,6 @@ class _EvaluationContext:
         return evaluate_call
 
 
-# TODO Delete this method
-# pylint: disable=too-many-arguments
-def _test_solver_result(
-    test_client,
-    solver_status_code: int,
-    solver_result,
-    expected_score: int,
-    expected_message: str,
-    use_test_challenge: bool = False,
-):
-    request = _run_solver(
-        test_client, solver_status_code, solver_result, use_test_challenge
-    )
-    assert request["runId"] == "142"
-    assert request["score"] == expected_score
-    assert request["message"] == expected_message
-
-
 def _run_solver(
     test_client,
     solver_status_code: int,
@@ -97,124 +68,101 @@ def _run_solver(
     request: requests.PreparedRequest = context.evaluate(
         use_test_challenge=use_test_challenge
     ).request
-    return json.loads(cast(bytes, request.body).decode("utf-8"))
+
+    evaluation = json.loads(cast(bytes, request.body).decode("utf-8"))
+
+    assert evaluation["runId"] == "142"
+
+    return evaluation
 
 
 @responses.activate
-def test_solution_error(client):
-    _test_solver_result(
-        client,
-        503,
-        "Some internal error",
-        0,
-        "Error: Got 503 from solver https://solver/technical-analysis. Some internal error",
+def test_solution_error(test_client):
+    evaluation = _run_solver(test_client, 503, "Some internal error")
+    assert evaluation["score"] == 0
+    assert (
+        "Error: Got 503 from solver https://solver/technical-analysis. Some internal error"
+        in evaluation["message"]
     )
 
 
 @responses.activate
-def test_solution_wrong_format(client):
-    _test_solver_result(
-        client,
-        200,
-        "some non-json",
-        0,
-        "Error: Failed to parse json <some non-json>. Expecting value: line 1 column 1 (char 0)",
-    )
+def test_solution_wrong_format(test_client):
+    evaluation = _run_solver(test_client, 200, "some non-json")
+    assert evaluation["score"] == 0
+    assert "Error: Failed to parse json <some non-json>" in evaluation["message"]
 
 
-# I'm not sure how much state there is in the test_client so doing one test per method
+# TODO I'm not sure how much state there is in the test_client so doing one test per method
 
 
 @responses.activate
-def test_solution_invalid_json_payload1(client):
-    _test_solver_result(
-        client,
-        200,
-        "}",
-        0,
-        "Error: Failed to parse json <}>. Expecting value: line 1 column 1 (char 0)",
-    )
+def test_solution_invalid_json_payload1(test_client):
+    evaluation = _run_solver(test_client, 200, "}")
+    assert evaluation["score"] == 0
+    assert "Error: Failed to parse json <}>" in evaluation["message"]
 
 
 @responses.activate
-def test_solution_invalid_json_payload2(client):
-    _test_solver_result(
-        client,
-        200,
-        "[1, 2",
-        0,
-        "Error: Failed to parse json <[1, 2>. Expecting ',' delimiter: line 1 column 6 (char 5)",
-    )
+def test_solution_invalid_json_payload2(test_client):
+    evaluation = _run_solver(test_client, 200, "[1, 2")
+    assert evaluation["score"] == 0
+    assert "Error: Failed to parse json <[1, 2>" in evaluation["message"]
 
 
 @responses.activate
-def test_solution_invalid_json_payload3(client):
-    _test_solver_result(
-        client,
-        200,
-        json.dumps("[1, 2"),
-        0,
-        "Error: Expected List[List[int]], got <[1, 2>",
-    )
+def test_solution_invalid_json_payload3(test_client):
+    evaluation = _run_solver(test_client, 200, json.dumps("[1, 2"))
+    assert evaluation["score"] == 0
+    assert "Error: Expected List[List[int]], got <[1, 2>" in evaluation["message"]
 
 
 @responses.activate
-def test_solution_error_numeric_payload(client):
-    _test_solver_result(
-        client, 200, json.dumps(42), 0, "Error: Expected List[List[int]], got <42>"
-    )
+def test_solution_error_numeric_payload(test_client):
+    evaluation = _run_solver(test_client, 200, json.dumps(42))
+    assert evaluation["score"] == 0
+    assert "Error: Expected List[List[int]], got <42>" in evaluation["message"]
 
 
 @responses.activate
-def test_solution_empty_payload(client):
-    _test_solver_result(
-        client,
-        200,
-        None,
-        0,
-        "Error: Failed to parse json <>. Expecting value: line 1 column 1 (char 0)",
-    )
+def test_solution_empty_payload(test_client):
+    evaluation = _run_solver(test_client, 200, None)
+    assert evaluation["score"] == 0
+    assert "Error: Failed to parse json <>" in evaluation["message"]
 
 
 @responses.activate
-def test_solution_empty_string_payload(client):
-    _test_solver_result(
-        client,
-        200,
-        "",
-        0,
-        "Error: Failed to parse json <>. Expecting value: line 1 column 1 (char 0)",
-    )
+def test_solution_empty_string_payload(test_client):
+    evaluation = _run_solver(test_client, 200, "")
+    assert evaluation["score"] == 0
+    assert "Error: Failed to parse json <>" in evaluation["message"]
 
 
 @responses.activate
-def test_solution_empty_string_json_payload(client):
-    _test_solver_result(
-        client, 200, json.dumps(""), 0, "Error: Expected List[List[int]], got <>"
-    )
+def test_solution_empty_string_json_payload(test_client):
+    evaluation = _run_solver(test_client, 200, json.dumps(""))
+    assert evaluation["score"] == 0
+    assert "Error: Expected List[List[int]], got <>" in evaluation["message"]
 
 
 @responses.activate
-def test_solution_empty_list_payload(client):
-    _test_solver_result(
-        client, 200, json.dumps([]), 0, "Error: Expected 4 results, got 0: []"
-    )
+def test_solution_empty_list_payload(test_client):
+    evaluation = _run_solver(test_client, 200, json.dumps([]))
+    assert evaluation["score"] == 0
+    assert "Error: Expected 4 results, got 0: []" in evaluation["message"]
 
 
 @responses.activate
-def test_solution_not_enough_results(client):
-    _test_solver_result(
-        client,
-        200,
-        json.dumps([[], []]),
-        0,
-        "Error: Expected 4 results, got 2: [[], []]",
-    )
+def test_solution_not_enough_results(test_client):
+    evaluation = _run_solver(test_client, 200, json.dumps([[], []]))
+
+    assert evaluation["score"] == 0
+    assert "Error: Expected 4 results, got 2: [[], []]" in evaluation["message"]
 
 
 @responses.activate
-def test_solution_not_json_mime(client):
-    context = _EvaluationContext(client)
+def test_solution_not_json_mime(test_client):
+    context = _EvaluationContext(test_client)
     responses.add(
         responses.POST,
         context.solver_url,
@@ -231,23 +179,17 @@ def test_solution_not_json_mime(client):
 
 
 @responses.activate
-def test_solution(client):
-    request = _run_solver(
-        client,
-        200,
-        json.dumps(
-            [[11, 13, 20, 23], [25, 29], [10, 11, 20, 21, 22, 23, 25], [15, 21, 27, 28]]
-        ),
-        use_test_challenge=True,
-    )
+def test_solution(test_client):
+    solution = json.dumps([[11, 13, 20, 23], [25, 29], [10, 23, 25], [15, 21, 27, 28]])
+    request = _run_solver(test_client, 200, solution, use_test_challenge=True)
 
-    assert request["score"] == 42
+    assert request["score"] == 38
     assert "Scenario 1 score is 0.45" in request["message"]
 
 
 @responses.activate
-def test_timeout(client):
-    context = _EvaluationContext(client)
+def test_timeout(test_client):
+    context = _EvaluationContext(test_client)
     responses.add(
         responses.POST, context.solver_url, body=requests.exceptions.Timeout()
     )
@@ -257,7 +199,7 @@ def test_timeout(client):
     ).request
     request = json.loads(cast(bytes, request.body).decode("utf-8"))
     assert (
-        request["message"]
-        == "Error: https://solver/technical-analysis timed out after 28s"
+        "Error: https://solver/technical-analysis timed out after 28s"
+        in request["message"]
     )
     assert request["score"] == 0

@@ -10,11 +10,11 @@ TODO:
 
 - Align code and markdown in instructions.html
 - Log model parameters
-- Refactor to consolidate usage of test_client
 - Test in both HK and SG
 - Create evaluator notebook
 - Script to clone all repos from heroku?
 - How to avoid committing generated zip and html but still have them on Heroku?
+- ✓ Refactor to consolidate usage of test_client
 - ✗ Mention model parameters in instructions and add them to inspiration visualization titles
 - ✓ Move sample input to "input section" in instructions page
 - ✓ Think about how to reformulate "full index range"
