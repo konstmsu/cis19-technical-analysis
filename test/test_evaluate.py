@@ -8,7 +8,7 @@ def test_create_challenge_input(snapshot):
 
 
 def test_calculate_score(snapshot):
-    scenarios = generation.get_standard_scenarios(1)
+    scenarios = generation.get_standard_scenarios(2)
     results = [
         my_solver.solve(0, s.train_signal, s.test_size, max_wave_count=1)[0]
         for s in scenarios
