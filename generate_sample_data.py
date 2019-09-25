@@ -1,6 +1,6 @@
 #!./venv/bin/python
 
-import json
+import pprint
 import zipfile
 import os
 import app.generation
@@ -22,7 +22,9 @@ def generate_files():
         print(f"Writing '{zip_file.filename}'", end="")
         for seed in seeds:
             scenarios = app.generation.get_standard_scenarios(seed)
-            data = json.dumps([s.train_signal.tolist() for s in scenarios])
+            data = pprint.pformat(
+                [s.train_signal.tolist() for s in scenarios], compact=True
+            )
             filename = f"TA_{seed}.json"
             zip_file.writestr(filename, data)
             print(".", end="", flush=True)

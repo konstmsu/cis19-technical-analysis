@@ -9,10 +9,12 @@ Developed by Konstantin Spirin for CodeIT Suisse 2019.
 TODO:
 
 - Mention alternating buy-sell in assumptions rather than output
+- Scale displayed maths (via cookies?)
 - Test in both HK and SG
 - Create evaluator notebook
 - Script to clone all repos from heroku?
 - How to avoid committing generated zip and html but still have them on Heroku?
+- ✓ Use pprint for sample data
 - ✓ Add Favicon
 - ✓ Align code and markdown in instructions.html
 - ✓ Log ~~model parameters~~ random seed
