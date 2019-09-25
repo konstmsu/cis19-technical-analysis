@@ -209,8 +209,5 @@ def test_timeout(test_client):
         use_test_challenge=False
     ).request
     request = json.loads(cast(bytes, request.body).decode("utf-8"))
-    assert (
-        "Error: https://solver/technical-analysis timed out after 28s"
-        in request["message"]
-    )
+    assert "Error: Timed out after 28s" in request["message"]
     assert request["score"] == 0

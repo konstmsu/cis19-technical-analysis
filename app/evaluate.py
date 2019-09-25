@@ -71,7 +71,7 @@ def execute_team_solution(
     if is_test:
         messages.append("Test run")
 
-    messages.append(f"ruId: {run_id}, teamUrl: {team_url}")
+    messages.append(f"runId: {run_id}, teamUrl: {team_url}")
 
     seed = 3 if is_test else random.randrange(1_000_000_000)
     scenarios = (
@@ -80,7 +80,7 @@ def execute_team_solution(
         else generation.get_standard_scenarios(seed)
     )
 
-    messages.append(f"Seed is {seed}")
+    messages.append(f"Seed is {seed:,}")
 
     challenge_input: ChallengeInput = create_challenge_input(scenarios)
     solver_url = team_url + "/technical-analysis"
@@ -93,7 +93,7 @@ def execute_team_solution(
             solver_url, json=challenge_input, timeout=timeout
         )
     except requests.exceptions.Timeout:
-        return create_error_response(f"{solver_url} timed out after {timeout}s")
+        return create_error_response(f"Timed out after {timeout}s")
 
     end = time.time()
     messages.append(f"Solver finished in {end-start:.1f}s")
