@@ -8,8 +8,8 @@ Developed by Konstantin Spirin for CodeIT Suisse 2019.
 
 TODO:
 
-- (maybe) Disable sample solver in production
 - Mention alternating buy-sell in assumptions rather than output
+- (maybe) Disable sample solver in production via feature toggle
 - Scale displayed maths (via cookies?)
 - Test in both HK and SG
 - Create evaluator notebook
