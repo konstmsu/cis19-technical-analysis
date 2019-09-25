@@ -8,7 +8,7 @@ def test_get_sample_data(test_client):
     response = test_client.get("/static/sample_data.zip")
     headers = response.headers
     assert b"HTML" not in response.data
-    assert headers["Content-Type"] == "application/x-zip-compressed"
+    assert "zip" in headers["Content-Type"]
     assert 500_000 < int(headers["Content-Length"]) < 600_000
     assert headers["Content-Disposition"] == "attachment; filename=sample_data.zip"
 
