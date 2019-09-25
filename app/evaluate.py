@@ -65,14 +65,21 @@ def execute_team_solution(
     else:
         scenarios = generation.get_standard_scenarios(random.randrange(1_000_000_000))
 
+    def create_error_response(error):
+        return create_evaluate_callback_response(run_id, 0, f"Error: {error}")
+
     challenge_input: ChallengeInput = create_challenge_input(scenarios)
     solver_url = team_url + "/technical-analysis"
     current_app.logger.info("Posting to %s input %s", solver_url, challenge_input)
-    response: requests.models.Response = requests.post(solver_url, json=challenge_input)
-    current_app.logger.info("solver_url: %s, response: %s", solver_url, response.text)
+    timeout = 28
+    try:
+        response: requests.models.Response = requests.post(
+            solver_url, json=challenge_input, timeout=timeout
+        )
+    except requests.exceptions.Timeout:
+        return create_error_response(f"{solver_url} timed out after {timeout}s")
 
-    def create_error_response(error):
-        return create_evaluate_callback_response(run_id, 0, f"Error: {error}")
+    current_app.logger.info("solver_url: %s, response: %s", solver_url, response.text)
 
     if response.status_code != 200:
         return create_error_response(
