@@ -63,18 +63,24 @@ def execute_team_solution(
     team_url: str, run_id: str, is_test: bool
 ) -> EvaluateCallbackPayload:
     messages = []
-    if is_test:
-        messages.append("Test run")
 
     def create_error_response(error):
         messages.append(f"Error: {error}")
         return create_evaluate_callback_response(run_id, 0, messages)
 
+    if is_test:
+        messages.append("Test run")
+
+    messages.append(f"ruId: {run_id}, teamUrl: {team_url}")
+
+    seed = 3 if is_test else random.randrange(1_000_000_000)
     scenarios = (
-        generation.get_standard_scenarios(3, train_size=10, test_size=20)
+        generation.get_standard_scenarios(seed, train_size=10, test_size=20)
         if is_test
-        else generation.get_standard_scenarios(random.randrange(1_000_000_000))
+        else generation.get_standard_scenarios(seed)
     )
+
+    messages.append(f"Seed is {seed}")
 
     challenge_input: ChallengeInput = create_challenge_input(scenarios)
     solver_url = team_url + "/technical-analysis"

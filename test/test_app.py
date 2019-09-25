@@ -184,7 +184,8 @@ def test_solution(test_client):
     request = _run_solver(test_client, 200, solution, use_test_challenge=True)
 
     assert request["score"] == 38
-    assert "Scenario 1 score is 0.45" in request["message"]
+    assert ". Scenario 1 score is 0.45" in request["message"]
+    assert ". Seed is 3. " in request["message"]
 
 
 @responses.activate
