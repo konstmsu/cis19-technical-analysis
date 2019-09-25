@@ -11,10 +11,13 @@ TODO:
 - Add instructions page link to confluence
 - Handle timeouts
 - Log model parameters
-- Generate more training data, maybe even provide Python snippet?
+- Check technical_analysis_sample_data.zip can be opened on Windows
+- Add link to zip into instructions
 - Test in both HK and SG
 - Create evaluator notebook
 - Script to clone all repos from heroku?
+- How to avoid committing generated zip and html but still have them on Heroku?
+- ✓ Generate more training data
 - ✓ ! First image is not rendered on instructions page
 - ✓ Include content into non-200 errors
 - ✓ Instructions page title should mention "Technical Analysis"
