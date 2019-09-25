@@ -13,10 +13,10 @@ def get_instructions():
     return send_file("../instructions.html")
 
 
-@BLUEPRINT.route("/technical_analysis_sample_data.zip")
+@BLUEPRINT.route("/static/sample_data.zip")
 def get_sample_data():
     return send_file(
-        "../sample_data/sample_data.zip",
+        "../static/sample_data.zip",
         as_attachment=True,
-        attachment_filename="technical_analysis_sample_data.zip",
+        attachment_filename="sample_data.zip",
     )
