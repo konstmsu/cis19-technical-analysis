@@ -13,4 +13,4 @@ def test_calculate_score(snapshot):
         my_solver.solve(0, s.train_signal, s.test_size, max_wave_count=1)[0]
         for s in scenarios
     ]
-    snapshot.assert_match(evaluate.calculate_score("test_run", scenarios, results))
+    snapshot.assert_match(evaluate.calculate_coordinator_score(scenarios, results))

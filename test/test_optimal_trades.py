@@ -43,10 +43,10 @@ def test_brute():
         scenarios = get_standard_scenarios(seed)
 
         def test(name, results):
-            score100 = evaluate.calculate_score(
-                f"{name} test seed {seed}", scenarios, results
-            )["score"]
-            assert score100 < 5, f"{name} brute, seed {seed}"
+            coordinator_score, _ = evaluate.calculate_coordinator_score(
+                scenarios, results
+            )
+            assert coordinator_score < 5, f"{name} brute, seed {seed}"
 
         test("empty", [[] for _ in scenarios])
         test("all", [np.arange(s.test_size) + s.train_size for s in scenarios])

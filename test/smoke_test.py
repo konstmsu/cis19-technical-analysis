@@ -13,3 +13,13 @@ def test_challenge_registered():
         print(challenge.keys())
         assert challenge["isActive"]
         assert challenge["weight"] == 10
+
+
+def test_challenge_up():
+    for url in [
+        "https://cis19-dr2-technical-analysis.com",
+        "https://cis2019-technical-analysis.com",
+    ]:
+        response = requests.get(f"{url}/ping")
+        assert response.status_code == 200
+        assert response.text == "pong"

@@ -15,9 +15,9 @@ ChallengeInput = List[List[int]]
 EvaluateCallbackPayload = dict
 
 
-@BLUEPRINT.route("/test")
+@BLUEPRINT.route("/ping")
 def test_route():
-    return "It Works!"
+    return "pong"
 
 
 @BLUEPRINT.route("/evaluate", methods=["POST"])
@@ -88,15 +88,18 @@ def execute_team_solution(
         return create_error_response(f"Expected List[List[int]], got <{results}>")
 
     try:
-        return calculate_score(run_id, scenarios, results)
+        messages = []
+        if is_test:
+            messages.append("Test run")
+        score, score_messages = calculate_coordinator_score(scenarios, results)
+        messages += score_messages
+        return create_evaluate_callback_response(run_id, score, "<br/>".join(messages))
     except Exception as ex:  # pylint: disable=broad-except
         return create_error_response(ex)
 
 
-def calculate_score(
-    run_id: str,
-    scenarios: Collection[generation.Scenario],
-    results: Collection[Collection[int]],
+def calculate_coordinator_score(
+    scenarios: Collection[generation.Scenario], results: Collection[Collection[int]]
 ):
     assert len(results) == len(
         scenarios
@@ -126,6 +129,4 @@ def calculate_score(
 
     coordinator_score = trade_simulator.get_cooridnator_score(scores)
 
-    return create_evaluate_callback_response(
-        run_id, coordinator_score, ". ".join(messages)
-    )
+    return (coordinator_score, messages)

@@ -418,8 +418,12 @@ snapshots['test_create_challenge_input 1'] = [
     ]
 ]
 
-snapshots['test_calculate_score 1'] = {
-    'message': 'Scenario 1 score is 1.00, amounts are 81.80 / 81.80. Scenario 2 score is 0.00, amounts are 0.79 / 22.77. Scenario 3 score is 0.00, amounts are 0.30 / 400.32. Scenario 4 score is 0.10, amounts are 95.35 / 909.56',
-    'runId': 'test_run',
-    'score': 15
-}
+snapshots['test_calculate_score 1'] = (
+    15,
+    [
+        'Scenario 1 score is 1.00, amounts are 81.80 / 81.80',
+        'Scenario 2 score is 0.00, amounts are 0.79 / 22.77',
+        'Scenario 3 score is 0.00, amounts are 0.30 / 400.32',
+        'Scenario 4 score is 0.10, amounts are 95.35 / 909.56'
+    ]
+)

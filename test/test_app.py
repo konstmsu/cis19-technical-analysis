@@ -205,9 +205,7 @@ def test_solution_not_json_mime(client):
     )
     context.add_evaluate_callback(200)
     evaluate = context.evaluate(use_test_challenge=True)
-    expected_body = (
-        """{"runId": "142", "score": 5, "message": "Scenario 1 score is 0.45"""
-    )
+    expected_body = """{"runId": "142", "score": 5, "message": "Test run<br/>Scenario 1 score is 0.45"""
     assert evaluate.request.body.decode("ascii").startswith(expected_body)
 
 
@@ -220,10 +218,10 @@ def test_solution(client):
             [[11, 13, 20, 23], [25, 29], [10, 11, 20, 21, 22, 23, 25], [15, 21, 27, 28]]
         ),
         42,
-        """\
-Scenario 1 score is 0.45, amounts are 1.26 / 1.58. \
-Scenario 2 score is 1.00, amounts are 1.01 / 1.01. \
-Scenario 3 score is 0.13, amounts are 1.05 / 1.37. \
+        """Test run<br/>\
+Scenario 1 score is 0.45, amounts are 1.26 / 1.58<br/>\
+Scenario 2 score is 1.00, amounts are 1.01 / 1.01<br/>\
+Scenario 3 score is 0.13, amounts are 1.05 / 1.37<br/>\
 Scenario 4 score is 0.32, amounts are 1.24 / 1.74""",
         use_test_challenge=True,
     )

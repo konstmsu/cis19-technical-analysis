@@ -4,7 +4,7 @@ from app.trade_optimizer import get_optimal_trades
 
 
 def test_my_solver():
-    for seed in range(1, 5):
+    for seed in range(1, 3):
         for scenario_index, scenario in enumerate(
             generation.get_standard_scenarios(seed)
         ):

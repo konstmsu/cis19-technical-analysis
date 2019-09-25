@@ -15,7 +15,7 @@ test:
   script:
     - ./install_requirements_dev.sh
     - . ./venv/bin/activate
-    - pytest
+    - pytest -k "not smoke"
     - mypy .
     - ./lint.sh --disable=fixme,unused-argument,duplicate-code
 
