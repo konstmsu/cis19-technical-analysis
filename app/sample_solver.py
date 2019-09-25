@@ -1,4 +1,3 @@
-import time
 from flask import Blueprint, request, jsonify, current_app
 from app.evaluate import ChallengeInput
 from . import my_solver
@@ -8,8 +7,6 @@ BLUEPRINT = Blueprint("solver", __name__)
 
 @BLUEPRINT.route("/technical-analysis", methods=["POST"])
 def solve():
-    print("Sleeping...")
-    time.sleep(30)
     challenge_input: ChallengeInput = request.get_json()
     current_app.logger.info("Input: %s", challenge_input)
     result = [

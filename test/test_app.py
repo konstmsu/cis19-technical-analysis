@@ -1,8 +1,10 @@
 # pylint: disable=redefined-outer-name,line-too-long
 
 import json
+from typing import cast
 import pytest
 import responses
+import requests
 
 from app import create_app
 
@@ -65,6 +67,7 @@ class _EvaluationContext:
         return evaluate_call
 
 
+# TODO Delete this method
 # pylint: disable=too-many-arguments
 def _test_solver_result(
     test_client,
@@ -74,12 +77,27 @@ def _test_solver_result(
     expected_message: str,
     use_test_challenge: bool = False,
 ):
+    request = _run_solver(
+        test_client, solver_status_code, solver_result, use_test_challenge
+    )
+    assert request["runId"] == "142"
+    assert request["score"] == expected_score
+    assert request["message"] == expected_message
+
+
+def _run_solver(
+    test_client,
+    solver_status_code: int,
+    solver_result,
+    use_test_challenge: bool = False,
+):
     context = _EvaluationContext(test_client)
     context.add_solver_response(solver_status_code, solver_result)
     context.add_evaluate_callback(200)
-    evaluate = context.evaluate(use_test_challenge=use_test_challenge)
-    expected_body = f'{{"runId": "142", "score": {expected_score}, "message": "{expected_message}"}}'
-    assert evaluate.request.body == expected_body.encode("ascii")
+    request: requests.PreparedRequest = context.evaluate(
+        use_test_challenge=use_test_challenge
+    ).request
+    return json.loads(cast(bytes, request.body).decode("ascii"))
 
 
 @responses.activate
@@ -205,23 +223,41 @@ def test_solution_not_json_mime(client):
     )
     context.add_evaluate_callback(200)
     evaluate = context.evaluate(use_test_challenge=True)
-    expected_body = """{"runId": "142", "score": 5, "message": "Test run<br/>Scenario 1 score is 0.45"""
-    assert evaluate.request.body.decode("ascii").startswith(expected_body)
+    body = json.loads(evaluate.request.body.decode("ascii"))
+    assert body["score"] == 5
+    assert "Scenario 1 score is 0.45" in body["message"]
+    assert "Test run" in body["message"]
+    assert "Solver finished in" in body["message"]
 
 
 @responses.activate
 def test_solution(client):
-    _test_solver_result(
+    request = _run_solver(
         client,
         200,
         json.dumps(
             [[11, 13, 20, 23], [25, 29], [10, 11, 20, 21, 22, 23, 25], [15, 21, 27, 28]]
         ),
-        42,
-        """Test run<br/>\
-Scenario 1 score is 0.45, amounts are 1.26 / 1.58<br/>\
-Scenario 2 score is 1.00, amounts are 1.01 / 1.01<br/>\
-Scenario 3 score is 0.13, amounts are 1.05 / 1.37<br/>\
-Scenario 4 score is 0.32, amounts are 1.24 / 1.74""",
         use_test_challenge=True,
     )
+
+    assert request["score"] == 42
+    assert "Scenario 1 score is 0.45" in request["message"]
+
+
+@responses.activate
+def test_timeout(client):
+    context = _EvaluationContext(client)
+    responses.add(
+        responses.POST, context.solver_url, body=requests.exceptions.Timeout()
+    )
+    context.add_evaluate_callback(200)
+    request: requests.PreparedRequest = context.evaluate(
+        use_test_challenge=False
+    ).request
+    request = json.loads(cast(bytes, request.body).decode("ascii"))
+    assert (
+        request["message"]
+        == "Error: https://solver/technical-analysis timed out after 28s"
+    )
+    assert request["score"] == 0

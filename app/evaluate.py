@@ -1,5 +1,6 @@
 from typing import Collection, List
 import random
+import time
 from json import JSONDecodeError
 
 import requests
@@ -56,21 +57,23 @@ def create_evaluate_callback_response(
 ) -> EvaluateCallbackPayload:
     return {"runId": run_id, "score": coordinator_score, "message": message}
 
-
+# pylint: disable=too-many-locals
 def execute_team_solution(
     team_url: str, run_id: str, is_test: bool
 ) -> EvaluateCallbackPayload:
-    if is_test:
-        scenarios = generation.get_standard_scenarios(3, train_size=10, test_size=20)
-    else:
-        scenarios = generation.get_standard_scenarios(random.randrange(1_000_000_000))
-
     def create_error_response(error):
         return create_evaluate_callback_response(run_id, 0, f"Error: {error}")
+
+    scenarios = (
+        generation.get_standard_scenarios(3, train_size=10, test_size=20)
+        if is_test
+        else generation.get_standard_scenarios(random.randrange(1_000_000_000))
+    )
 
     challenge_input: ChallengeInput = create_challenge_input(scenarios)
     solver_url = team_url + "/technical-analysis"
     current_app.logger.info("Posting to %s input %s", solver_url, challenge_input)
+    start = time.time()
     timeout = 28
     try:
         response: requests.models.Response = requests.post(
@@ -78,6 +81,8 @@ def execute_team_solution(
         )
     except requests.exceptions.Timeout:
         return create_error_response(f"{solver_url} timed out after {timeout}s")
+
+    end = time.time()
 
     current_app.logger.info("solver_url: %s, response: %s", solver_url, response.text)
 
@@ -98,6 +103,8 @@ def execute_team_solution(
         messages = []
         if is_test:
             messages.append("Test run")
+
+        messages.append(f"Solver finished in {end-start:.1f}s")
         score, score_messages = calculate_coordinator_score(scenarios, results)
         messages += score_messages
         return create_evaluate_callback_response(run_id, score, "<br/>".join(messages))
