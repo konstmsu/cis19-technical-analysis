@@ -8,6 +8,7 @@ Developed by Konstantin Spirin for CodeIT Suisse 2019.
 
 TODO:
 
+- Mention alternating buy-sell in assumptions rather than output
 - Test in both HK and SG
 - Create evaluator notebook
 - Script to clone all repos from heroku?
