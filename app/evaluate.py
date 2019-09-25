@@ -57,6 +57,7 @@ def create_evaluate_callback_response(
 ) -> EvaluateCallbackPayload:
     return {"runId": run_id, "score": coordinator_score, "message": message}
 
+
 # pylint: disable=too-many-locals
 def execute_team_solution(
     team_url: str, run_id: str, is_test: bool
@@ -107,7 +108,7 @@ def execute_team_solution(
         messages.append(f"Solver finished in {end-start:.1f}s")
         score, score_messages = calculate_coordinator_score(scenarios, results)
         messages += score_messages
-        return create_evaluate_callback_response(run_id, score, "<br/>".join(messages))
+        return create_evaluate_callback_response(run_id, score, ". ".join(messages))
     except Exception as ex:  # pylint: disable=broad-except
         return create_error_response(ex)
 
