@@ -19,6 +19,11 @@ def test_instructions_style(test_client):
     assert b".prompt" in response.data
 
 
+def test_favicon(test_client):
+    response = test_client.get("/favicon.ico")
+    assert int(response.headers["Content-Length"]) == 1406
+
+
 class _EvaluationContext:
     def __init__(self, test_client):
         self.test_client = test_client

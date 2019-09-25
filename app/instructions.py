@@ -18,10 +18,11 @@ def get_custom_css():
     return send_file("../custom.css")
 
 
+@BLUEPRINT.route("/favicon.ico")
+def get_favicon():
+    return send_file("../favicon.ico")
+
+
 @BLUEPRINT.route("/static/sample_data.zip")
 def get_sample_data():
-    return send_file(
-        "../static/sample_data.zip",
-        as_attachment=True,
-        attachment_filename="sample_data.zip",
-    )
+    return send_file("../static/sample_data.zip", as_attachment=True)
