@@ -8,10 +8,10 @@ Developed by Konstantin Spirin for CodeIT Suisse 2019.
 
 TODO:
 
-- Add .txt extension to readme in sample_data.zip to be able to open on Windows
 - Log model parameters
+- Refactor to consolidate usage of test_client
+- Align code and markdown in instructions.html
 - (maybe) Add code snippet to generate data and an empty solver
-- Add "Challenge" to instructions page title
 - (maybe not) Move sample input to "input section" in instructions page
 - Mention model parameters in instructions and add them to inspiration visualization titles
 - (maybe) Think about how to reformulate "full index range"
@@ -20,6 +20,8 @@ TODO:
 - Create evaluator notebook
 - Script to clone all repos from heroku?
 - How to avoid committing generated zip and html but still have them on Heroku?
+- ✓ Add "Challenge" to instructions page title
+- ✓ Add .txt extension to readme in sample_data.zip to be able to open on Windows
 - ✓ Add solution running time to message
 - ✓ Check sample_data.zip can be opened on Windows and contains README
 - ✓ Handle timeouts

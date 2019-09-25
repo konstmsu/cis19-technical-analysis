@@ -15,7 +15,7 @@ def generate_files():
     zip_filename = os.path.join(directory, "sample_data.zip")
     with zipfile.ZipFile(zip_filename, "w", zipfile.ZIP_DEFLATED) as zip_file:
         zip_file.writestr(
-            "README",
+            "README.TXT",
             "Sample training data for Technical Analysis challenge of CodeIT Suisse 2019",
         )
 

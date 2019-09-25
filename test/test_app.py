@@ -97,7 +97,7 @@ def _run_solver(
     request: requests.PreparedRequest = context.evaluate(
         use_test_challenge=use_test_challenge
     ).request
-    return json.loads(cast(bytes, request.body).decode("ascii"))
+    return json.loads(cast(bytes, request.body).decode("utf-8"))
 
 
 @responses.activate
@@ -223,7 +223,7 @@ def test_solution_not_json_mime(client):
     )
     context.add_evaluate_callback(200)
     evaluate = context.evaluate(use_test_challenge=True)
-    body = json.loads(evaluate.request.body.decode("ascii"))
+    body = json.loads(evaluate.request.body.decode("utf-8"))
     assert body["score"] == 5
     assert "Scenario 1 score is 0.45" in body["message"]
     assert "Test run" in body["message"]
@@ -255,7 +255,7 @@ def test_timeout(client):
     request: requests.PreparedRequest = context.evaluate(
         use_test_challenge=False
     ).request
-    request = json.loads(cast(bytes, request.body).decode("ascii"))
+    request = json.loads(cast(bytes, request.body).decode("utf-8"))
     assert (
         request["message"]
         == "Error: https://solver/technical-analysis timed out after 28s"

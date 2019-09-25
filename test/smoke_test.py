@@ -17,8 +17,8 @@ def test_challenge_registered():
 
 def test_challenge_up():
     for url in [
-        "https://cis19-dr2-technical-analysis.com",
-        "https://cis2019-technical-analysis.com",
+        "https://cis2019-technical-analysis.herokuapp.com",
+        "https://cis19-dr2-technical-analysis.herokuapp.com",
     ]:
         response = requests.get(f"{url}/ping")
         assert response.status_code == 200
