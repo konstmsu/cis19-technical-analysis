@@ -8,14 +8,23 @@ Developed by Konstantin Spirin for CodeIT Suisse 2019.
 
 TODO:
 
-- Add instructions page link to confluence
+- Increase complexity to 10
+- Add .txt extension to readme in sample_data.zip to be able to open on Windows
 - Handle timeouts
 - Log model parameters
+- (maybe) Add solution running time to message
+- Add code snippet to generate data and an empty solver
+- Add "Challenge" to instructions page title
+- (maybe not) Move sample input to "input section" in instructions page
+- Mention model parameters in instructions and add them to inspiration visualization titles
+- (maybe) Think about how to reformulate "sull index range"
+- Add axis labels on the first illustration
 - Check sample_data.zip can be opened on Windows and contains README
 - Test in both HK and SG
 - Create evaluator notebook
 - Script to clone all repos from heroku?
 - How to avoid committing generated zip and html but still have them on Heroku?
+- ✓ Add instructions page link to confluence
 - ✓ Add link to zip into instructions
 - ✓ Generate more training data
 - ✓ ! First image is not rendered on instructions page
