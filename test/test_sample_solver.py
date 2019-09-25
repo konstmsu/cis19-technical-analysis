@@ -9,7 +9,7 @@ from app.generation import get_standard_scenarios
 @responses.activate
 def test_evaluate(test_client):
     def curvy(indexes):
-        return np.sin(indexes * 0.001) + indexes
+        return np.sin(indexes * 0.005) + indexes
 
     response = test_client.post(
         "/technical-analysis",
