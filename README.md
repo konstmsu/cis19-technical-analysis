@@ -8,18 +8,19 @@ Developed by Konstantin Spirin for CodeIT Suisse 2019.
 
 TODO:
 
+- Align code and markdown in instructions.html
 - Log model parameters
 - Refactor to consolidate usage of test_client
-- Align code and markdown in instructions.html
-- (maybe) Add code snippet to generate data and an empty solver
-- (maybe not) Move sample input to "input section" in instructions page
-- Mention model parameters in instructions and add them to inspiration visualization titles
-- (maybe) Think about how to reformulate "full index range"
-- Add axis labels on the first illustration
 - Test in both HK and SG
 - Create evaluator notebook
 - Script to clone all repos from heroku?
 - How to avoid committing generated zip and html but still have them on Heroku?
+- ✗ Mention model parameters in instructions and add them to inspiration visualization titles
+- ✓ Move sample input to "input section" in instructions page
+- ✓ Think about how to reformulate "full index range"
+- ✓ Add axis labels on the first illustration
+- ✓ Add code snippet to generate more training data
+- ✓ Publish to EU
 - ✓ Add "Challenge" to instructions page title
 - ✓ Add .txt extension to readme in sample_data.zip to be able to open on Windows
 - ✓ Add solution running time to message
