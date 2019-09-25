@@ -8,11 +8,12 @@ Developed by Konstantin Spirin for CodeIT Suisse 2019.
 
 TODO:
 
-- Align code and markdown in instructions.html
+- Add Favicon
 - Test in both HK and SG
 - Create evaluator notebook
 - Script to clone all repos from heroku?
 - How to avoid committing generated zip and html but still have them on Heroku?
+- ✓ Align code and markdown in instructions.html
 - ✓ Log ~~model parameters~~ random seed
 - ✓ Refactor to consolidate usage of test_client
 - ✗ ~~Mention model parameters in instructions and add to inspiration visualization titles~~

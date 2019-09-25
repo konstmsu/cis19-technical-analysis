@@ -13,6 +13,11 @@ def get_instructions():
     return send_file("../instructions.html")
 
 
+@BLUEPRINT.route("/custom.css")
+def get_custom_css():
+    return send_file("../custom.css")
+
+
 @BLUEPRINT.route("/static/sample_data.zip")
 def get_sample_data():
     return send_file(

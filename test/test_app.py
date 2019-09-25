@@ -14,6 +14,11 @@ def test_instructions(test_client):
         assert b'class="input"' not in response.data
 
 
+def test_instructions_style(test_client):
+    response = test_client.get("/custom.css")
+    assert b".prompt" in response.data
+
+
 class _EvaluationContext:
     def __init__(self, test_client):
         self.test_client = test_client
