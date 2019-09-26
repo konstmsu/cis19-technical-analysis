@@ -10,7 +10,6 @@ TODO:
 
 - Mention alternating buy-sell in assumptions rather than output
 - (maybe) Disable sample solver in production via feature toggle
-- Try floating point as coordinator score
 - Scale displayed maths (via cookies?)
 - Test in both HK and SG
 - Create evaluator notebook
