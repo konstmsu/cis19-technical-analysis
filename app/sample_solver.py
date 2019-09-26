@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, abort
 from app.evaluate import ChallengeInput
 from . import my_solver
 
@@ -7,6 +7,10 @@ BLUEPRINT = Blueprint("solver", __name__)
 
 @BLUEPRINT.route("/technical-analysis", methods=["POST"])
 def solve():
+    # pylint: disable=singleton-comparison
+    if current_app.config["ENABLE_SOLVER"] != True:
+        abort(405)
+
     challenge_input: ChallengeInput = request.get_json()
     current_app.logger.info("Input: %s", challenge_input)
     result = [

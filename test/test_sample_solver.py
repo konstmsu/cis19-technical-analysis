@@ -8,6 +8,8 @@ from app.generation import get_standard_scenarios
 
 @responses.activate
 def test_evaluate(test_client):
+    test_client.app.config["ENABLE_SOLVER"] = True
+
     def curvy(indexes):
         return np.sin(indexes * 0.005) + indexes
 

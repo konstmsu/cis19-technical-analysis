@@ -87,6 +87,14 @@ def _run_solver(
 
 
 @responses.activate
+def test_solver_feature_toggle(test_client):
+    response = test_client.get("/technical-analysis")
+    assert response.status_code == 405
+    # TODO
+    # assert b"Solver is not enabled" in response.data
+
+
+@responses.activate
 def test_solution_error(test_client):
     evaluation = _run_solver(test_client, 503, "Some internal error")
     assert evaluation["score"] == 0
