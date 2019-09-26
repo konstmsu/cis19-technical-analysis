@@ -8,13 +8,14 @@ Developed by Konstantin Spirin for CodeIT Suisse 2019.
 
 TODO:
 
+- Disabled solver should not return 405
 - Mention alternating buy-sell in assumptions rather than output
-- (maybe) Disable sample solver in production via feature toggle
 - Scale displayed maths (via cookies?)
 - Test in both HK and SG
 - Create evaluator notebook
 - Script to clone all repos from heroku?
 - How to avoid committing generated zip and html but still have them on Heroku?
+- ✓ (maybe) Disable sample solver in production via feature toggle
 - ✓ Use pprint for sample data
 - ✓ Add Favicon
 - ✓ Align code and markdown in instructions.html
