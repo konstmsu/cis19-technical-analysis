@@ -1,3 +1,4 @@
+import numpy as np
 from snapshottest.pytest import SnapshotTest
 
 from app.generation import ScenarioBuilder, get_standard_scenarios
@@ -21,4 +22,6 @@ def test_generator_is_stable(snapshot):
     # TODO Decrease sizes
     for i, scenario in enumerate(get_standard_scenarios(42)):
         snapshot.assert_match(scenario.train_signal.tolist(), f"train_signal {i}")
-        snapshot.assert_match(scenario.test_signal.tolist(), f"test_signal {i}")
+        snapshot.assert_match(
+            np.round(scenario.test_signal, 8).tolist(), f"test_signal {i}"
+        )

@@ -10,11 +10,12 @@ TODO:
 
 - Mention alternating buy-sell in assumptions rather than output
 - Disabled solver should not return 405
-- Run slow tests less frequently
 - Add index labels to trades?
 - Add t to x axis?
 - Test in both HK and SG
+- Stabilize numeric fluctuations in tests across all platforms
 - Create evaluator notebook
+- Run slow tests less frequently
 - Script to clone all repos from heroku?
 - How to avoid committing generated zip and html but still have them on Heroku?
 - ✓ Scale displayed maths (via cookies?)
