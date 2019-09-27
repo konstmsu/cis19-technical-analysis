@@ -10,7 +10,9 @@ TODO:
 
 - Test in both HK and SG
 - Create evaluator notebook
+- Sample data is useless because it only contains training data and no test data
 - Disabled solver should not return 405
+- Add timestamp to instructions page
 - Run slow tests less frequently
 - Script to clone all repos from heroku?
 - How to avoid committing generated zip and html but still have them on Heroku?
