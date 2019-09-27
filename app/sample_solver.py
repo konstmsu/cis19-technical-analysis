@@ -3,12 +3,13 @@ from app.evaluate import ChallengeInput
 from . import my_solver
 
 BLUEPRINT = Blueprint("solver", __name__)
+ENABLE_SOLVER_KEY = "ENABLE_SOLVER"
 
 
 @BLUEPRINT.route("/technical-analysis", methods=["POST"])
 def solve():
     # pylint: disable=singleton-comparison
-    if current_app.config["ENABLE_SOLVER"] != True:
+    if current_app.config[ENABLE_SOLVER_KEY] != True:
         abort(405)
 
     challenge_input: ChallengeInput = request.get_json()

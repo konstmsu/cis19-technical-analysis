@@ -5,6 +5,8 @@ from typing import cast
 from test.flask_testing import test_client
 import responses
 import requests
+import pytest
+import app
 
 
 def test_instructions(test_client):
@@ -219,3 +221,21 @@ def test_timeout(test_client):
     request = json.loads(cast(bytes, request.body).decode("utf-8"))
     assert "Error: Timed out after 28s" in request["message"]
     assert request["score"] == 0
+
+
+# pylint: disable=singleton-comparison
+def test_get_bool_value():
+    for value in ["True", "TRUE", "true", True]:
+        assert app.coerce_to_bool(value, False) == True, value
+
+    for value in ["false", "False", "FALSE", False]:
+        assert app.coerce_to_bool(value, True) == False, value
+
+    for value in [None, ""]:
+        for default in [True, False]:
+            assert app.coerce_to_bool(value, default) == default
+
+    for value in ["hello", 42, "yes", "1", 1, "no", "0", 0]:
+        for default in [True, False]:
+            with pytest.raises(Exception):
+                app.coerce_to_bool(value, default)

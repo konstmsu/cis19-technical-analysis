@@ -1,6 +1,0 @@
-POST http://localhost:5000/technical-analysis
-content-type: application/json
-
-{
-	"prices": [500, 501, 504, 502, 501]
-}
