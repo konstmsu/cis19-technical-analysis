@@ -1,16 +1,21 @@
-from flask import Blueprint, send_file, url_for, redirect
+from flask import Blueprint, send_file, url_for, redirect, make_response, request
 
 BLUEPRINT = Blueprint("instructions", __name__)
+
+MATHS_SCALE_COOKIE = "mjx.menu"
 
 
 @BLUEPRINT.route("/")
 def default():
-    return redirect(url_for(f"{BLUEPRINT.name}.{get_instructions.__qualname__}"))
+    return redirect(url_for(f"{BLUEPRINT.name}.{get_instructions.__qualname__}"), code=307)
 
 
 @BLUEPRINT.route("/instructions")
 def get_instructions():
-    return send_file("../instructions.html")
+    response = make_response(send_file("../instructions.html"))
+    if MATHS_SCALE_COOKIE not in request.cookies:
+        response.set_cookie(MATHS_SCALE_COOKIE, "scale%3A150")
+    return response
 
 
 @BLUEPRINT.route("/custom.css")

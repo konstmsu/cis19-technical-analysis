@@ -9,12 +9,15 @@ Developed by Konstantin Spirin for CodeIT Suisse 2019.
 TODO:
 
 - Mention alternating buy-sell in assumptions rather than output
-- Scale displayed maths (via cookies?)
 - Disabled solver should not return 405
+- Run slow tests less frequently
+- Add index labels to trades?
+- Add t to x axis?
 - Test in both HK and SG
 - Create evaluator notebook
 - Script to clone all repos from heroku?
 - How to avoid committing generated zip and html but still have them on Heroku?
+- ✓ Scale displayed maths (via cookies?)
 - ✓ Register on Telegram support channel
 - ✓ (maybe) Disable sample solver in production via feature toggle
 - ✓ Use pprint for sample data

@@ -1,7 +1,7 @@
+# pylint: disable=redefined-outer-name,unused-import
 import json
 from typing import cast
 
-# pylint: disable=redefined-outer-name,unused-import
 from test.flask_testing import test_client
 import responses
 import requests
@@ -9,11 +9,30 @@ import pytest
 import app
 
 
+def test_redirect_to_instructions(test_client):
+    response = test_client.get("/")
+    assert response.location == "http://localhost/instructions"
+    assert response.status_code == 307
+
+
 def test_instructions(test_client):
-    for url in ["/", "/instructions"]:
-        response = test_client.get(url, follow_redirects=True)
-        assert b"function family" in response.data
-        assert b'class="input"' not in response.data
+    response = test_client.get("/instructions")
+    assert b"function family" in response.data
+    assert b'class="input"' not in response.data
+    assert _get_cookie(test_client, "mjx.menu").value == "scale%3A150"
+
+
+def _get_cookie(client, name):
+    [cookie] = [c for c in client.cookie_jar if c.name == name]
+    return cookie
+
+
+def test_instructions_scale_cookie_is_preserved(test_client):
+    test_client.set_cookie("", "mjx.menu", "scale%3A146")
+    response = test_client.get("/instructions", follow_redirects=True)
+    assert b"function family" in response.data
+    assert b'class="input"' not in response.data
+    assert _get_cookie(test_client, "mjx.menu").value == "scale%3A146"
 
 
 def test_instructions_style(test_client):
