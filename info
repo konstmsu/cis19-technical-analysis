@@ -4,3 +4,12 @@ Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjb2RlaXRzdWlzc2VhcGFjMjAx
 
 http://dryrun2-ui.herokuapp.com/#/login
 http://dryrun2-coordinator.herokuapp.com/#/login
+
+Prod:
+cs.1@gmail.com
+sg:cstest123
+hk:csteam123
+
+Leaderboards:
+https://sg-codeit-backend.herokuapp.com/leaderboard/index.html
+https://hk-codeit-backend.herokuapp.com/leaderboard/index.html
