@@ -35,7 +35,7 @@ def evaluate():
         team_url, run_id, is_test
     )
 
-    print("Evaluation result: %s", evaluation_result)
+    current_app.logger.info("Evaluation result: %s", evaluation_result)
 
     # pylint: disable=line-too-long
     authorization_token = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjb2RlaXRzdWlzc2VhcGFjMjAxOUBnbWFpbC5jb20iLCJleHAiOjE1Njk4NjA2NTF9.l9PrR9r9XFA0gdqvtW1hfOm4bmHSvAVW6es1eV72v3MwjGxBCQPNbE3QtF0WtFKaLEqqaumS8Ut_KkOgG1gWCA"
@@ -44,8 +44,6 @@ def evaluate():
         json=evaluation_result,
         headers={"Authorization": authorization_token},
     )
-
-    current_app.logger.info("Evaluate callback returned %s", callback_result.content)
 
     return {"callback_result": str(callback_result.content)}
 
