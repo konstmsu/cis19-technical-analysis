@@ -27,6 +27,7 @@ staging:
 
 production:
   stage: deploy
+  when: manual
   script:
     - git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/cis2019-technical-analysis.git
     - git push -f heroku HEAD:master

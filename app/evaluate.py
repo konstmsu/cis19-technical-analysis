@@ -35,6 +35,8 @@ def evaluate():
         team_url, run_id, is_test
     )
 
+    print("Evaluation result: %s", evaluation_result)
+
     # pylint: disable=line-too-long
     authorization_token = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjb2RlaXRzdWlzc2VhcGFjMjAxOUBnbWFpbC5jb20iLCJleHAiOjE1Njk4NjA2NTF9.l9PrR9r9XFA0gdqvtW1hfOm4bmHSvAVW6es1eV72v3MwjGxBCQPNbE3QtF0WtFKaLEqqaumS8Ut_KkOgG1gWCA"
     callback_result = requests.post(
