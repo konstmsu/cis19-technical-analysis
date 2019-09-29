@@ -58,7 +58,7 @@ def create_evaluate_callback_response(
     return {"runId": run_id, "score": coordinator_score, "message": ". ".join(messages)}
 
 
-# pylint: disable=too-many-locals
+# pylint: disable=too-many-locals,too-many-return-statements
 def execute_team_solution(
     team_url: str, run_id: str, is_test: bool
 ) -> EvaluateCallbackPayload:
@@ -94,6 +94,8 @@ def execute_team_solution(
         )
     except requests.exceptions.Timeout:
         return create_error_response(f"Timed out after {timeout}s")
+    except Exception as exc: # pylint: disable=broad-except
+        return create_error_response(f"Failed to POST to {solver_url}: {exc}")
 
     end = time.time()
     messages.append(f"Solver finished in {end-start:.1f}s")

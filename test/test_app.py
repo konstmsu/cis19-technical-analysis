@@ -1,5 +1,6 @@
 # pylint: disable=redefined-outer-name,unused-import
 import json
+import http
 from typing import cast
 
 from test.flask_testing import test_client
@@ -239,6 +240,24 @@ def test_timeout(test_client):
     ).request
     request = json.loads(cast(bytes, request.body).decode("utf-8"))
     assert "Error: Timed out after 28s" in request["message"]
+    assert request["score"] == 0
+
+
+@responses.activate
+def test_remote_disconnected(test_client):
+    context = _EvaluationContext(test_client)
+    responses.add(
+        responses.POST,
+        context.solver_url,
+        body=http.client.RemoteDisconnected("connection closed"),
+    )
+    context.add_evaluate_callback(200)
+    request: requests.PreparedRequest = context.evaluate(
+        use_test_challenge=False
+    ).request
+    request = json.loads(cast(bytes, request.body).decode("utf-8"))
+    # pylint: disable=line-too-long
+    assert "Failed to POST to https://solver/technical-analysis: connection closed" in request["message"]
     assert request["score"] == 0
 
 
