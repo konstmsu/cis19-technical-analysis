@@ -1,6 +1,6 @@
 jupyter==1.0.0
 jupyter_contrib_nbextensions==0.5.1
-notebook==6.4.1
+notebook==6.4.10
 mypy==0.720
 rope==0.14.0
 pylint==2.4.1
